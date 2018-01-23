@@ -1,6 +1,13 @@
+project(sdl2exe)
+
 add_subdirectory(pierogi)
 
-add_executable(sdl2eng WIN32 main.cpp)
+add_executable(sdl2eng main.cpp)
+
+set_target_properties(sdl2eng 
+    PROPERTIES 
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+    )
 
 target_link_libraries(sdl2eng PUBLIC
     pierogi

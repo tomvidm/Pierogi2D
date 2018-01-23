@@ -18,7 +18,7 @@ namespace p2d {
         // Create sdl window
         sdlWindowPtr = SDL_CreateWindow(
                             "Default Window",
-                            100, 100,
+                            900, 100,
                             640, 480,
                             SDL_WINDOW_SHOWN
                             );
