@@ -4,6 +4,8 @@ add_subdirectory(pierogi)
 
 add_executable(p2d main.cpp)
 
+set (CMAKE_CXX_STANDARD 11)
+
 set_target_properties(p2d 
     PROPERTIES 
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin

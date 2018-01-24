@@ -6,12 +6,10 @@
 int main(int, char**)
 {
     p2d::RenderWindow renderWindow;
-    p2d::math::Vector<float, 3> vec1;
-    p2d::math::Vector<float, 3> vec2;
-    vec1[1] = 1;
-    vec1 += vec2;
     p2d::Clock clk;
     p2d::input::EventHandler eventHandler;
+    p2d::math::Vector2f a(1.f, 2.f);
+    p2d::math::Vector3f b(1.f, 2.f, 3.f);
     bool quit = false;
     while (!quit) {
         while (eventHandler.fetchEvent()) {
@@ -25,7 +23,6 @@ int main(int, char**)
             std::cout << clk.getElapsedSeconds() << std::endl;
             clk.reset();
             renderWindow.blink();
-            vec1 *= 2;
         }
     } // while
 

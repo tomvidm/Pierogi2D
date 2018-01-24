@@ -1,6 +1,7 @@
 project(p2d-core)
 
 add_subdirectory(input)
+add_subdirectory(math)
 
 add_library(p2d-core
     p2d_window.cpp
@@ -18,4 +19,5 @@ target_link_libraries(p2d-core PUBLIC
 
 target_include_directories(p2d-core PUBLIC
     ${SDL2_INCLUDE_DIR}
+    
     )

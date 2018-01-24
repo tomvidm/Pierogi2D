@@ -17,4 +17,5 @@ target_link_libraries(p2d-input PUBLIC
 
 target_include_directories(p2d-input PUBLIC
     ${SDL2_INCLUDE_DIR}
+    ${SRC_DIR}/pierogi/math
     )
