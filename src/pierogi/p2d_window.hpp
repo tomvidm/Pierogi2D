@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+#include "GL/glew.h"
 #include "SDL.h"
 #include "p2d_typedefs.hpp"
 
@@ -16,10 +17,10 @@ namespace p2d {
         RenderWindow();
         ~RenderWindow();
 
-        void blink();
     private:
         SDL_Window* sdlWindowPtr;
         SDL_Renderer* sdlRendererPtr;
+        SDL_GLContext glContext;
     }; // class RenderWindow
 } // namespace p2d
 

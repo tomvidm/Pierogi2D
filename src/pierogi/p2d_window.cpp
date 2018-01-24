@@ -1,12 +1,6 @@
 #include "p2d_window.hpp"
 
 namespace p2d {
-    // This function simply clears the framebuffer and flips it again.
-    void RenderWindow::blink() {
-        SDL_RenderClear(sdlRendererPtr);
-        SDL_RenderPresent(sdlRendererPtr);
-    } // void blink()
-
     // TODO: Break up into smaller functions
     // TODO: Fix error handling
     RenderWindow::RenderWindow() {
@@ -20,7 +14,7 @@ namespace p2d {
                             "Default Window",
                             900, 100,
                             640, 480,
-                            SDL_WINDOW_SHOWN
+                            SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL
                             );
 
         if (sdlWindowPtr == nullptr) {
@@ -30,24 +24,12 @@ namespace p2d {
             return;
         }
 
-        // Create sdl renderer and associate with sdl window
-        sdlRendererPtr = SDL_CreateRenderer(
-                            sdlWindowPtr,
-                            -1,
-                            SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
-                            );
-
-        if (sdlRendererPtr == nullptr) {
-            SDL_DestroyRenderer(sdlRendererPtr);
-            SDL_DestroyWindow(sdlWindowPtr);
-            std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
-            SDL_Quit();
-            return;
-        }
+        glContext = SDL_GL_CreateContext(sdlWindowPtr);
+        glewInit();
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     } // RenderWindow
 
     RenderWindow::~RenderWindow() {
-        SDL_DestroyWindow(sdlWindowPtr);
         SDL_DestroyWindow(sdlWindowPtr);
         SDL_Quit();
     } // ~RenderWindow

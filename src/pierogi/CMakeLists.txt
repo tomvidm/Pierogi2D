@@ -14,10 +14,13 @@ set_target_properties(p2d-core
     )
 
 target_link_libraries(p2d-core PUBLIC
+    ${OPENGL_LIBRARIES}
     ${SDL2_LIBRARIES}
+    ${GLEW_LIBRARIES}
     )
 
 target_include_directories(p2d-core PUBLIC
+    ${OPENGL_INCLUDE_DIR}
     ${SDL2_INCLUDE_DIR}
-    
+    ${GLEW_INCLUDE_DIR}
     )
