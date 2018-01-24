@@ -11,11 +11,12 @@ int main(int, char**)
     vec1[1] = 1;
     vec1 += vec2;
     p2d::Clock clk;
-    SDL_Event event;
+    p2d::input::EventHandler eventHandler;
     bool quit = false;
     while (!quit) {
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
+        while (eventHandler.fetchEvent()) {
+            p2d::input::Event e = eventHandler.getEvent();
+            if (e.eventType == p2d::input::EventType::QUIT) {
                 quit = true;
             } // if
         } // while

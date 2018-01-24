@@ -7,13 +7,13 @@ namespace p2d {
 
     void Clock::reset() {
         tickStart_ = SDL_GetTicks();
-    } // void reset
+    } // reset
 
     Uint32 Clock::getElapsedTime() const {
         return SDL_GetTicks() - tickStart_;
-    } // Uint32 getElapsedTime
+    } // getElapsedTime
 
     float Clock::getElapsedSeconds() const {
         return static_cast<float>(SDL_GetTicks() - tickStart_)/1000.f;
-    }
+    } // getElapsedSeconds
 } // namespace p2d
