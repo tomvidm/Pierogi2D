@@ -16,5 +16,6 @@ target_link_libraries(sdl2eng PUBLIC
 
 target_include_directories(sdl2eng PUBLIC
     ${SRC_DIR}/pierogi
+    ${SRC_DIR}/pierogi/math
     ${SDL2_INCLUDE_DIR}
     )

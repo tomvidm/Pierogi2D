@@ -1,5 +1,7 @@
 project(pierogi)
 
+#add_subdirectory(math)
+
 add_library(pierogi
     p2d_window.cpp
     p2d_clock.cpp

@@ -3,5 +3,6 @@
 
 #include "p2d_clock.hpp"
 #include "p2d_window.hpp"
+#include "p2d_math.hpp"
 
 #endif
