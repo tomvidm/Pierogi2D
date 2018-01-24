@@ -21,9 +21,9 @@ int main(int, char**)
         } // while
         if (clk.getElapsedTime() > 500)
         {
+            std::cout << clk.getElapsedSeconds() << std::endl;
             clk.reset();
             renderWindow.blink();
-            std::cout << "I'm here!" << std::endl;
             vec1 *= 2;
         }
     } // while
