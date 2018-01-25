@@ -1,6 +1,7 @@
 project(p2d-math)
 
 add_library(p2d-math
+    p2d_math.cpp
     p2d_vector.cpp
     )
 

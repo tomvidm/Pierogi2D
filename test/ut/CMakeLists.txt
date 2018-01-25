@@ -2,6 +2,8 @@ project(p2d-unittests )
 
 set(UT_SOURCES
     test_trivial.cpp
+    test_p2d_circularbuffer.cpp
+    test_p2d_vector.cpp
     )
 
 add_executable(p2d-unittests
