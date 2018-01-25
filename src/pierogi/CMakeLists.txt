@@ -1,7 +1,8 @@
 project(p2d-core)
 
-add_subdirectory(input)
+add_subdirectory(debug)
 add_subdirectory(math)
+add_subdirectory(input)
 
 add_library(p2d-core
     p2d_window.cpp

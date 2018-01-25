@@ -3,6 +3,7 @@
 
 #include "SDL.h"
 
+#include "p2d_debug.hpp"
 #include "p2d_event.hpp"
 #include "p2d_mouse.hpp"
 #include "p2d_mousestate.hpp"

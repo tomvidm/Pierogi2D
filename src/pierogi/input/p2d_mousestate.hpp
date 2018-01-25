@@ -20,7 +20,7 @@ namespace p2d { namespace input {
 
         static MouseState* instancePtr;
     private:
-        bool mouseButtonPressed[MouseButton::NUM_MOUSE_BUTTONS];
+        bool mouseButtonPressed[static_cast<int>(MouseButton::NUM_MOUSE_BUTTONS)];
     }; // MouseState
 } // namespace input
 } // namespace p2d
