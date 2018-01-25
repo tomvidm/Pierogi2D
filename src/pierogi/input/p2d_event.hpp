@@ -12,13 +12,16 @@ namespace p2d { namespace input {
         NONE,
         QUIT,
         MOUSE_BUTTON_PRESS,
-        MOUSE_BUTTON_RELEASE
+        MOUSE_BUTTON_RELEASE,
+        MOUSE_MOTION
     }; // EventType
 
     // The Event struct holds information about the event,
     // the time and a union holding the different Event types.
     struct Event {
+        Event();
         Event(const EventType& eventType);
+        Event(const Event& other);
         EventType eventType;
         Uint32 timestamp;
         union {

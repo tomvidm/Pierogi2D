@@ -13,10 +13,11 @@
 namespace p2d { namespace input {
     class MouseEventHandler {
     public:
-        Event onButtonPress(const SDL_Event& sdlEvent);
-        Event onButtonRelease(const SDL_Event& sdlEvent);
+        Event onButtonPress(const SDL_MouseButtonEvent& sdlMouseButtonEvent);
+        Event onButtonRelease(const SDL_MouseButtonEvent& sdlMouseButtonEvent);
+        Event onMotion(const SDL_MouseMotionEvent& sdlMouseMotionEvent);
     private:
-        MouseState* mouesStatePtr = MouseState::getInstancePtr();
+        MouseState* mouseStatePtr = MouseState::getInstancePtr();
     }; // MouseEventHandler
 } // namespace input
 } // namespace p2d

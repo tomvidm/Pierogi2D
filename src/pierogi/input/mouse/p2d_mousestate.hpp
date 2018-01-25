@@ -10,6 +10,7 @@ namespace p2d { namespace input {
     
     class MouseState {
     public:
+        void setMousePosition(const Vector2i& pos);
         void setButtonPressState(const MouseButton& button, const bool& isPressed);
         bool isPressed(const MouseButton& button) const;
 
@@ -21,6 +22,8 @@ namespace p2d { namespace input {
         static MouseState* instancePtr;
     private:
         bool mouseButtonPressed[static_cast<int>(MouseButton::NUM_MOUSE_BUTTONS)];
+
+        Vector2i currentMousePos;
     }; // MouseState
 } // namespace input
 } // namespace p2d

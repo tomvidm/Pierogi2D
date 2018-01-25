@@ -17,9 +17,11 @@ set_target_properties(p2d-input
 target_link_libraries(p2d-input PUBLIC
     ${SDL2_LIBRARIES}
     p2d-debug
+    p2d-math
     )
 
 target_include_directories(p2d-input PUBLIC
     ${SDL2_INCLUDE_DIR}
     ${SRC_DIR}/pierogi/debug
+    ${SRC_DIR}/pierogi/math
     )

@@ -3,6 +3,10 @@
 namespace p2d { namespace input {
     MouseState* MouseState::instancePtr = nullptr;
 
+    void MouseState::setMousePosition(const Vector2i& pos) {
+        currentMousePos = pos;
+    }
+
     void MouseState::setButtonPressState(const MouseButton& button, const bool& isPressed) {
         mouseButtonPressed[static_cast<int>(button)] = isPressed;
     } // setButtonPressState
