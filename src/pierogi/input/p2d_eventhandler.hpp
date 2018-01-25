@@ -6,8 +6,8 @@
 #include "SDL.h"
 
 #include "p2d_event.hpp"
-#include "p2d_mouse.hpp"
-#include "p2d_mouseeventhandler.hpp"
+#include "mouse/p2d_mouse.hpp"
+#include "mouse/p2d_mouseeventhandler.hpp"
 
 namespace p2d { namespace input {
     class EventHandler {

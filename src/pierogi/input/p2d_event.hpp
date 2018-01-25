@@ -5,7 +5,7 @@
 
 #include "SDL.h"
 
-#include "p2d_mouse.hpp"
+#include "mouse/p2d_mouse.hpp"
 
 namespace p2d { namespace input {
     enum EventType {

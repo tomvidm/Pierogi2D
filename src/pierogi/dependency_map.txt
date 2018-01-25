@@ -1,0 +1,28 @@
+p2d-core depends on
+    p2d-debug
+    p2d-graphics
+    p2d-input
+    p2d-math
+    p2d-utility
+    SDL2
+    GLEW
+    OpenGL
+
+p2d-debug depends on
+    ...
+
+p2d-graphics depends on
+    SDL2
+    p2d-debug
+    p2d-math
+    p2d-utility
+
+p2d-input depends on
+    SDL2
+    p2d-debug
+
+p2d-math depends on
+    <cmath.h>
+
+p2d-utility depends on
+    ...
