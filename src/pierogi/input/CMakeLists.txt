@@ -24,4 +24,5 @@ target_include_directories(p2d-input PUBLIC
     ${SDL2_INCLUDE_DIR}
     ${SRC_DIR}/pierogi/debug
     ${SRC_DIR}/pierogi/math
+    ${SRC_DIR}/pierogi/utility
     )

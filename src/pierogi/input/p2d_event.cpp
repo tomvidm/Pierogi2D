@@ -17,12 +17,13 @@ namespace p2d { namespace input {
         switch(eventType) {
             case EventType::MOUSE_BUTTON_PRESS:
             case EventType::MOUSE_BUTTON_RELEASE:
+            case EventType::MOUSE_MOTION:
                 mouseEvent = other.mouseEvent;
             case EventType::QUIT:
                 break;
             default:
                 break;
         } // switch
-    }
+    } // copy constructor
 } // namespace input
 } // namespace p2d

@@ -13,7 +13,7 @@ namespace p2d { namespace debug {
         DEBUG,
         ERROR,
         FATAL
-    };
+    }; // LogLevel
 
     std::string logLevelToString(const LogLevel& logLevel);
 

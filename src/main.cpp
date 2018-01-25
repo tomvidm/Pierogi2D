@@ -8,7 +8,8 @@ int main(int, char**)
 {
     p2d::RenderWindow renderWindow;
 
-    p2d::Clock clk;
+    p2d::Clock clk1;
+    p2d::Clock clk2;
     p2d::input::EventHandler eventHandler;
     p2d::math::Vector2f a(1.f, 2.f);
     p2d::math::Vector3f b(1.f, 2.f, 3.f);
@@ -21,12 +22,19 @@ int main(int, char**)
                 quit = true;
             } // if
         } // while
-        if (clk.getElapsedTime() > 500)
+        if (clk1.getElapsedTime() > 200)
         {
-            std::cout << clk.getElapsedSeconds() << std::endl;
-            clk.reset();
+            std::cout << "clk1: " << clk1.getElapsedSeconds() << std::endl;
+            clk1.reset();
             renderWindow.renderDummy();
         }
+
+        if (clk2.getElapsedTime() > 400)
+        {
+            std::cout << "clk2: " << clk2.getElapsedSeconds() << std::endl;
+            clk2.reset();
+        }
+
     } // while
 
     return 0;

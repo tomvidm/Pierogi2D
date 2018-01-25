@@ -26,7 +26,7 @@ namespace p2d { namespace input {
         Uint32 timestamp;
         union {
             MouseEvent mouseEvent;
-        };
+        }; // union
     }; // Event
 } // namespace input
 } // namespace p2d

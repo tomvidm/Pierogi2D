@@ -2,6 +2,7 @@
 #define P2D_UTILITY_HPP
 
 #include "p2d_rect.hpp"
+#include "p2d_circularbuffer.hpp"
 
 namespace p2d { namespace utility {
     typedef Rect<float> FloatRect;

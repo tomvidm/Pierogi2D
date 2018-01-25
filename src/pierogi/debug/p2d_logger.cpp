@@ -23,7 +23,7 @@ namespace p2d { namespace debug {
     void Logger::log(const String& logString, const LogLevel logLevel) const {
         if (shouldLog(logLevel)) {
             std::cout << logLevelToString(logLevel) << logString << std::endl;
-        }
+        } // if
     } // log
 
     void Logger::setLogLevel(const LogLevel& newLogLevel) {

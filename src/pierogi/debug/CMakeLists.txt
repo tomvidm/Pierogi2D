@@ -1,6 +1,7 @@
 project(p2d-debug)
 
 add_library(p2d-debug
+    p2d_field.cpp
     p2d_logger.cpp
     )
 

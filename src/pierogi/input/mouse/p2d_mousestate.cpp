@@ -18,7 +18,7 @@ namespace p2d { namespace input {
     MouseState* MouseState::getInstancePtr() {
         if (instancePtr == nullptr) {
             instancePtr = new MouseState();
-        }
+        } // if
 
         return instancePtr;
     } // getInstancePtr
