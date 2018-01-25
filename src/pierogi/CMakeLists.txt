@@ -1,6 +1,7 @@
 project(p2d-core)
 
 add_subdirectory(debug)
+add_subdirectory(graphics)
 add_subdirectory(math)
 add_subdirectory(input)
 
