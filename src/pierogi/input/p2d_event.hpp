@@ -15,6 +15,8 @@ namespace p2d { namespace input {
         MOUSE_BUTTON_RELEASE
     }; // EventType
 
+    // The Event struct holds information about the event,
+    // the time and a union holding the different Event types.
     struct Event {
         Event(const EventType& eventType);
         EventType eventType;
@@ -23,14 +25,6 @@ namespace p2d { namespace input {
             MouseEvent mouseEvent;
         };
     }; // Event
-
-    class EventHandler {
-    public:
-        bool fetchEvent();
-        Event getEvent() const;
-    private:
-        SDL_Event sdlEvent;
-    }; // EventHandler
 } // namespace input
 } // namespace p2d
 

@@ -4,6 +4,8 @@ project(p2d-input)
 
 add_library(p2d-input
     p2d_event.cpp
+    p2d_eventhandler.cpp
+    p2d_mouseeventhandler.cpp
     p2d_mousestate.cpp
     )
 
@@ -18,5 +20,4 @@ target_link_libraries(p2d-input PUBLIC
 
 target_include_directories(p2d-input PUBLIC
     ${SDL2_INCLUDE_DIR}
-    ${SRC_DIR}/pierogi/math
     )

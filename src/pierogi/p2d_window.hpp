@@ -17,6 +17,12 @@ namespace p2d {
         RenderWindow();
         ~RenderWindow();
 
+        bool initSDL();
+        bool initWindow();
+        bool initGLContext();
+        bool initGL();
+
+        void renderDummy();
     private:
         SDL_Window* sdlWindowPtr;
         SDL_Renderer* sdlRendererPtr;
