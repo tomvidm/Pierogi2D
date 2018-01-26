@@ -41,8 +41,8 @@ namespace p2d { namespace utility {
 
     template <typename T>
     bool Rect<T>::contains(const Vector2<T>& point) const {
-        return !((point.getX() < origin.getX()) ||
-                 (point.getY() < origin.getY()) ||
+        return !((point.getX() <= origin.getX()) ||
+                 (point.getY() <= origin.getY()) ||
                  (point.getX() > origin.getX() + size.getX()) ||
                  (point.getY() > origin.getY() + size.getY()));
     } // contains
