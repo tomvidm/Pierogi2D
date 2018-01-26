@@ -7,6 +7,7 @@ namespace p2d { namespace utility {
     public:
         CircularBuffer();
         T head() const;
+        T tail() const;
         T operator [] (const unsigned int& index) const;
         T& operator [] (const unsigned int& index);
 
@@ -28,7 +29,12 @@ namespace p2d { namespace utility {
     template <typename T, unsigned int N>
     T CircularBuffer<T, N>::head() const {
         return buffer[headIndex];
-    }
+    } // head
+
+    template <typename T, unsigned int N>
+    T CircularBuffer<T, N>::tail() const {
+        return buffer[headIndex + (size - 1) % size];
+    } // head
 
     template <typename T, unsigned int N>
     T CircularBuffer<T, N>::operator [] (const unsigned int& index) const {

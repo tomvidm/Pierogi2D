@@ -7,16 +7,16 @@ TEST(TestMath, CircularBuffer) {
     EXPECT_EQ(circBuf[0], 0);
 
     circBuf.push(1);
-    EXPECT_EQ(circBuf[0], 0);
+    EXPECT_EQ(circBuf.head(), 0);
     circBuf.push(1);
-    EXPECT_EQ(circBuf[0], 0);
+    EXPECT_EQ(circBuf.head(), 0);
     circBuf.push(1);
-    EXPECT_EQ(circBuf[0], 0);
+    EXPECT_EQ(circBuf.head(), 0);
     circBuf.push(1);
-    EXPECT_EQ(circBuf[0], 0);
+    EXPECT_EQ(circBuf.head(), 0);
     circBuf.push(1);
-    EXPECT_EQ(circBuf[0], 1);
+    EXPECT_EQ(circBuf.head(), 1);
     circBuf.push(1);
-    EXPECT_EQ(circBuf[0], 1);
+    EXPECT_EQ(circBuf.head(), 1);
 
 }
