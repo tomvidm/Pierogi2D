@@ -3,6 +3,7 @@ project(p2d-unittests )
 set(UT_SOURCES
     test_p2d_circularbuffer.cpp
     test_p2d_vector.cpp
+    test_p2d_rect.cpp
     test_p2d_quadtree.cpp
     )
 
