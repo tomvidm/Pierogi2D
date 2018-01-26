@@ -31,6 +31,8 @@ namespace p2d { namespace math {
         inline T getY() const { return y_; }
         inline T& getX() { return x_; }
         inline T& getY() { return y_; }
+        inline Vector2<T> getVectorX() const { return Vector2<T>(x_, T(0)); }
+        inline Vector2<T> getVectorY() const { return Vector2<T>(T(0), y_); }
     private:
         T x_, y_;
     }; // Vector2

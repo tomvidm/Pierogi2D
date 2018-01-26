@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include "p2d_rect.hpp"
+
 #include "../debug/p2d_logger.hpp"
 
 namespace p2d { namespace utility {
@@ -27,12 +29,17 @@ namespace p2d { namespace utility {
         void subdivide();
         bool isLeafNode() const;
 
+        void setRectCoverage(const Rect<float>& rect);
+        bool coversPoint(const p2d::math::Vector2f& point) const;
+
         QuadTreeNode& operator[] (const SubQuad& which);
     private:
         const unsigned int capacity;
-
+        Rect<float> coverage;
         bool isLeafNode_ = true;
         QuadTreeNode* subnodes;
+
+        void distributeRectCoverageToSubnodes();
 
         p2d::debug::Logger* logger;
     }; // QuadTreeTree
@@ -50,6 +57,7 @@ namespace p2d { namespace utility {
             logger->log("Splitting quadtree...", p2d::debug::LogLevel::DEBUG);
             subnodes = new QuadTreeNode<T, N>[4];
             isLeafNode_ = false;
+            distributeRectCoverageToSubnodes();
         } else {
             logger->log("Already split...", p2d::debug::LogLevel::DEBUG);
         }
@@ -62,9 +70,29 @@ namespace p2d { namespace utility {
     } // subdivide
 
     template <typename T, uint N>
+    void QuadTreeNode<T, N>::setRectCoverage(const Rect<float>& rect) {
+        coverage = rect;
+    } // setRectCoverage
+
+    template <typename T, uint N>
+    bool QuadTreeNode<T, N>::coversPoint(const p2d::math::Vector2f& point) const {
+        return coverage.contains(point);
+    } // coversPoint
+
+    template <typename T, uint N>
     QuadTreeNode<T, N>& QuadTreeNode<T, N>::operator[] (const SubQuad& which) {
         return subnodes[static_cast<uint>(which)];
     } // operator []
+
+    template <typename T, uint N>
+    void QuadTreeNode<T, N>::distributeRectCoverageToSubnodes() {
+        if (isLeafNode()) { return; }
+        Rect<float> newCoverage = coverage * 0.5f;
+        subnodes[0].setRectCoverage(newCoverage);
+        subnodes[1].setRectCoverage(newCoverage + newCoverage.getSize().getVectorX());
+        subnodes[2].setRectCoverage(newCoverage + newCoverage.getSize());
+        subnodes[3].setRectCoverage(newCoverage + newCoverage.getSize().getVectorY());
+    } // distributeRectCoverageToSubnodes
 } // utility
 } // p2d
 
