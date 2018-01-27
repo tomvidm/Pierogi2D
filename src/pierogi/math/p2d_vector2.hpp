@@ -53,7 +53,7 @@ namespace p2d { namespace math {
     Vector2<T>::Vector2(const Vector2<T>& other) 
     : x_(other.getX()), y_(other.getY()) {
         ;
-    }
+    } // copy constructor
 
     template <typename T>
     void Vector2<T>::operator += (const Vector2<T>& rhs) {
@@ -110,7 +110,7 @@ namespace p2d { namespace math {
     Vector2<float> Vector2<T>::getFloatified() const {
         return Vector2<float>(static_cast<float>(x_),
                               static_cast<float>(y_));
-    }
+    } // getFloatified
 
     template <typename T>
     Vector2<float> Vector2<T>::getNormalized() const {

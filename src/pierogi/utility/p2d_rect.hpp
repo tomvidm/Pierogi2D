@@ -60,7 +60,7 @@ namespace p2d { namespace utility {
     template <typename T>
     void Rect<T>::operator *= (const float& factor) {
         size *= factor;
-    }
+    } // operator *
 
     template <typename T>
     Rect<T> Rect<T>::operator + (const Vector2<T>& rhs) {
