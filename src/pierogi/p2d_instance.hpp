@@ -4,6 +4,7 @@
 #include "p2d_logger.hpp"
 #include "p2d_clock.hpp"
 #include "p2d_eventhandler.hpp"
+#include "p2d_logger.hpp"
 #include "p2d_window.hpp"
 
 namespace p2d {
@@ -13,10 +14,16 @@ namespace p2d {
         ~Instance();
 
         void run();
+
+        inline bool isRunning() const { return isRunning_; }
     private:
-        void init();
-        ::p2d::RenderWindow renderWindow;
-        ::p2d::input::EventHandler eventHandler;
+        bool init();
+        p2d::RenderWindow renderWindow;
+        p2d::input::EventHandler eventHandler;
+        p2d::debug::Logger* logger;
+
+        unsigned int framePeriod_ = 100;
+        bool isRunning_;
     }; // class RenderWindow
 } // namespace p2d
 

@@ -6,8 +6,6 @@ namespace p2d {
     RenderWindow::RenderWindow() {
         initSDL();
         initWindow();
-        initGLContext();
-        initGL();
     } // RenderWindow
 
     RenderWindow::~RenderWindow() {
@@ -28,53 +26,33 @@ namespace p2d {
             "Default Window",
             900, 100,
             640, 480,
-            SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL
-        );
+            SDL_WINDOW_SHOWN //| SDL_WINDOW_OPENGL
+        ); // SDL_CreateWindow
 
         if (sdlWindowPtr == nullptr) {
             SDL_DestroyWindow(sdlWindowPtr);
             std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
             SDL_Quit();
             return false;
-        } else {
-            if (SDL_GL_SetSwapInterval(1) < 0) {
-                std::cout << "Warning: Unable to set VSync! SDL Error: " << SDL_GetError() << std::endl;
-            }
-        }
+        } // if
         return true;
     } // initWindow
 
-    bool RenderWindow::initGLContext() {
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-        // SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
-        //SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-        glContext = SDL_GL_CreateContext(sdlWindowPtr);
-        if (glContext == NULL) {
-            std::cout << "OpenGL context could not be created! SDL Error: " << SDL_GetError() << std::endl;
-        }
-        glewInit();
+    bool RenderWindow::initRenderer() {
+        sdlRendererPtr = SDL_CreateRenderer(
+            sdlWindowPtr,
+            -1,
+            SDL_RENDERER_ACCELERATED ||
+            SDL_RENDERER_PRESENTVSYNC
+        ); // SDL_CreateRenderer
+
+        if (sdlRendererPtr == nullptr) {
+            SDL_DestroyWindow(sdlWindowPtr);
+            SDL_DestroyRenderer(sdlRendererPtr);
+            std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
+            SDL_Quit();
+            return false;
+        } // if
         return true;
-    } // initGLContext
-
-    bool RenderWindow::initGL() {
-        glMatrixMode( GL_PROJECTION );
-        glLoadIdentity();
-        glMatrixMode( GL_MODELVIEW );
-        glLoadIdentity();
-        glClearColor( 0.f, 0.f, 0.f, 0.5f );
-
-        return true;
-    } // initGL
-
-    void RenderWindow::renderDummy() {
-        glClear( GL_COLOR_BUFFER_BIT );
-        glBegin( GL_QUADS );
-        glVertex2f( -0.5f, -0.5f );
-        glVertex2f( 0.5f, -0.5f );
-        glVertex2f( 0.5f, 0.5f );
-        glVertex2f( -0.5f, 0.5f );
-        glEnd();
-    }
-
+    } // initWindow
 } // namespace p2d

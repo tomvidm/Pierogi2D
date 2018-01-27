@@ -42,7 +42,6 @@ namespace p2d { namespace input {
     } // onButtonPress
 
     Event MouseEventHandler::onMotion(const SDL_MouseMotionEvent& sdlMouseMotionEvent) {
-        debug::Logger::getInstancePtr()->log("onMotion");
         mouseStatePtr->setMousePosition(Vector2i(sdlMouseMotionEvent.x,
                                                  sdlMouseMotionEvent.y));
         return Event(EventType::NONE);

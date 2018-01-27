@@ -15,7 +15,7 @@ target_link_libraries(p2d PUBLIC
     p2d-core
     p2d-input
     ${SDL2_LIBRARIES}
-    ${GLEW_LIBRARIES}
+    #${GLEW_LIBRARIES}
     )
 
 target_include_directories(p2d PUBLIC

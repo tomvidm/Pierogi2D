@@ -3,6 +3,8 @@
 
 #include "../math/p2d_math.hpp"
 
+#include "SDL.h"
+
 namespace p2d { namespace utility {
     using p2d::math::Vector2;
 

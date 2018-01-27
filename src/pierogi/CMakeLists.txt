@@ -19,7 +19,7 @@ set_target_properties(p2d-core
 target_link_libraries(p2d-core PUBLIC
     ${OPENGL_LIBRARIES}
     ${SDL2_LIBRARIES}
-    ${GLEW_LIBRARIES}
+    #${GLEW_LIBRARIES}
     p2d-debug
     p2d-input
     p2d-math

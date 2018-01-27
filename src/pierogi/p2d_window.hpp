@@ -19,14 +19,10 @@ namespace p2d {
 
         bool initSDL();
         bool initWindow();
-        bool initGLContext();
-        bool initGL();
-
-        void renderDummy();
+        bool initRenderer();
     private:
         SDL_Window* sdlWindowPtr;
         SDL_Renderer* sdlRendererPtr;
-        SDL_GLContext glContext;
     }; // class RenderWindow
 } // namespace p2d
 
