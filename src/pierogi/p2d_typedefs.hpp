@@ -5,6 +5,7 @@
 
 namespace p2d {
     typedef std::string String;
+    typedef unsigned int uint;
 } // namespace p2d
 
 #endif

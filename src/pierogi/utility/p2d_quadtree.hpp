@@ -23,6 +23,10 @@ namespace p2d { namespace utility {
     /*
     QuadTreeNode
     Holds N objects of type T and some info about its place in the quadtree.
+
+    REQUIRES:
+    The container holds pointers to objects of type T. For the algorithms to work,
+    T must have an interface which 
     */
     template <typename T, uint N>
     class QuadTreeNode {
@@ -31,10 +35,13 @@ namespace p2d { namespace utility {
         void subdivide();
         bool isLeafNode() const;
 
+        void insert(const T& obj);
+
         void setRectCoverage(const Rect<float>& rect);
         bool coversPoint(const p2d::math::Vector2f& point) const;
 
         QuadTreeNode& findNodeContaining(const p2d::math::Vector2f& point);
+        std::vector<T*> containedObjects();
 
         QuadTreeNode& operator[] (const SubQuad& which);
     protected:
@@ -43,6 +50,7 @@ namespace p2d { namespace utility {
     private:
         bool isLeafNode_ = true;
         const unsigned int capacity;
+        std::vector<T*> container;
         Rect<float> coverage;
         QuadTreeNode* subnodes;
         QuadTreeNode* parentPtr = nullptr;
@@ -51,6 +59,7 @@ namespace p2d { namespace utility {
         void distributeRectCoverageToSubnodes();
         void setParentOfSubnodes();
         void setSubnodeHeading();
+        // void distributeObjectsToSubnodes();
 
         p2d::debug::Logger* logger;
     }; // QuadTreeTree
@@ -65,7 +74,7 @@ namespace p2d { namespace utility {
     template <typename T, uint N>
     void QuadTreeNode<T, N>::subdivide() {
         if (isLeafNode()) {
-            //logger->log("Splitting quadtree...", p2d::debug::LogLevel::DEBUG);
+            logger->log("Splitting leaf node...", p2d::debug::LogLevel::DEBUG);
             subnodes = new QuadTreeNode<T, N>[4];
             isLeafNode_ = false;
             distributeRectCoverageToSubnodes();
@@ -81,6 +90,24 @@ namespace p2d { namespace utility {
     bool QuadTreeNode<T, N>::isLeafNode() const {
         return isLeafNode_;
     } // subdivide
+
+    template <typename T, uint N>
+    void QuadTreeNode<T, N>::insert(const T& obj) {
+        if (container.size() < capacity) {
+            container.push_back(&obj);
+        } else {
+            subdivide();
+            // distributeObjectsToSubnodes();
+            // findNodeContaining(obj.getPosition()).insert(obj);
+        }
+    }
+
+/*    template <typename T, uint N>
+    void distributeObjectsToSubnodes() {
+        for (auto objPtr : container) {
+            findNodeContaining.insert(//obj ref)
+        } // for
+    } // distributeObjectsToSubnodes*/
 
     template <typename T, uint N>
     void QuadTreeNode<T, N>::setParent(QuadTreeNode* newParentPtr) {
@@ -115,6 +142,20 @@ namespace p2d { namespace utility {
         } // for
         return *this;
     } // findNodeContaining
+
+    template <typename T, uint N>
+    std::vector<T*> QuadTreeNode<T, N>::containedObjects() {
+        if (isLeafNode()) {
+            return container;
+        } else {
+            std::vector<T*> result;
+            for (uint i = 0; i < 4; i++) {
+                std::vector<T*> collected = subnodes[i].containedObjects();
+                result.insert(result.end(), collected.begin(), collected.end());
+            } // for
+            return result;
+        } // if else
+    } // containedObjects
 
     template <typename T, uint N>
     QuadTreeNode<T, N>& QuadTreeNode<T, N>::operator[] (const SubQuad& which) {

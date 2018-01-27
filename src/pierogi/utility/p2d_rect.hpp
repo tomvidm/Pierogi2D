@@ -24,6 +24,8 @@ namespace p2d { namespace utility {
 
         Rect<T> Rect<T>::operator + (const Vector2<T>& rhs);
         Rect<T> Rect<T>::operator * (const float& factor);
+
+        SDL_Rect getSDLRect() const;
     private:
         Vector2<T> origin;
         Vector2<T> size;
@@ -76,6 +78,14 @@ namespace p2d { namespace utility {
         Rect<T> copy = *this;
         copy *= factor;
         return copy;
+    }
+
+    template <typename T>
+    SDL_Rect Rect<T>::getSDLRect() const {
+        return SDL_Rect(static_cast<int>(origin.getX()),
+                        static_cast<int>(origin.getY()),
+                        static_cast<int>(size.getX()),
+                        static_cast<int>(size.getY()));
     }
 } // namespace utility
 } // namespace p2d

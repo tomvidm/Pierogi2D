@@ -3,7 +3,6 @@
 
 #include <iostream>
 
-#include "GL/glew.h"
 #include "SDL.h"
 #include "p2d_typedefs.hpp"
 
@@ -20,6 +19,9 @@ namespace p2d {
         bool initSDL();
         bool initWindow();
         bool initRenderer();
+
+        inline SDL_Window* getWindow() { return sdlWindowPtr; }
+        inline SDL_Renderer* getRenderer() { return sdlRendererPtr; }
     private:
         SDL_Window* sdlWindowPtr;
         SDL_Renderer* sdlRendererPtr;

@@ -10,11 +10,12 @@ namespace p2d {
 
     RenderWindow::~RenderWindow() {
         SDL_DestroyWindow(sdlWindowPtr);
+        SDL_DestroyRenderer(sdlRendererPtr);
         SDL_Quit();
     } // ~RenderWindow
 
     bool RenderWindow::initSDL() {
-        if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
             std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
             return false;
         }
@@ -42,7 +43,6 @@ namespace p2d {
         sdlRendererPtr = SDL_CreateRenderer(
             sdlWindowPtr,
             -1,
-            SDL_RENDERER_ACCELERATED ||
             SDL_RENDERER_PRESENTVSYNC
         ); // SDL_CreateRenderer
 

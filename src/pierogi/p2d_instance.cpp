@@ -23,11 +23,10 @@ namespace p2d {
                     isRunning_ = false;
                 } // if
             } // while
-
             if (clk.getElapsedTime() > framePeriod_) {
                 clk.reset();
             } // if
-        }
+        } // while
     } // run
 
     bool Instance::init() {
