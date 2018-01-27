@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "p2d_quadtree.hpp"
+#include <iostream>
 
 TEST(TestQuadTree, QuadTreeWorks) {
     p2d::utility::QuadTreeNode<int, 10> qtree;
@@ -17,6 +18,8 @@ TEST(TestQuadTree, QuadTreeWorks) {
     EXPECT_FALSE(qtree[p2d::utility::SubQuad::NE].coversPoint(point));
      EXPECT_TRUE(qtree[p2d::utility::SubQuad::SE].coversPoint(point));
     EXPECT_FALSE(qtree[p2d::utility::SubQuad::SW].coversPoint(point));
+
+    EXPECT_EQ(&qtree[p2d::utility::SubQuad::SE], &qtree.findNodeContaining(point));
 
     EXPECT_FALSE(qtree.isLeafNode());
 }

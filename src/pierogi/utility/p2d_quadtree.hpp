@@ -13,10 +13,11 @@ namespace p2d { namespace utility {
     typedef unsigned int uint;
 
     enum SubQuad { 
+        ROOT = -1,
         NW = 0, 
         NE = 1, 
         SE = 2, 
-        SW = 3 
+        SW = 3
     };
 
     /*
@@ -33,41 +34,47 @@ namespace p2d { namespace utility {
         void setRectCoverage(const Rect<float>& rect);
         bool coversPoint(const p2d::math::Vector2f& point) const;
 
+        QuadTreeNode& findNodeContaining(const p2d::math::Vector2f& point);
+
         QuadTreeNode& operator[] (const SubQuad& which);
     protected:
         void setParent(QuadTreeNode* newParentPtr);
+        void setHeading(const SubQuad& heading);
     private:
         bool isLeafNode_ = true;
         const unsigned int capacity;
         Rect<float> coverage;
         QuadTreeNode* subnodes;
         QuadTreeNode* parentPtr = nullptr;
+        SubQuad heading;
 
         void distributeRectCoverageToSubnodes();
         void setParentOfSubnodes();
+        void setSubnodeHeading();
 
         p2d::debug::Logger* logger;
     }; // QuadTreeTree
 
     template <typename T, uint N>
     QuadTreeNode<T, N>::QuadTreeNode()
-    : capacity(N) {
+    : capacity(N), heading(SubQuad::ROOT) {
         logger = p2d::debug::Logger::getInstancePtr();
-        logger->log("QuadTreeNode constructed...", p2d::debug::LogLevel::DEBUG);
+        //logger->log("QuadTreeNode constructed...", p2d::debug::LogLevel::DEBUG);
     } // constructor
 
     template <typename T, uint N>
     void QuadTreeNode<T, N>::subdivide() {
         if (isLeafNode()) {
-            logger->log("Splitting quadtree...", p2d::debug::LogLevel::DEBUG);
+            //logger->log("Splitting quadtree...", p2d::debug::LogLevel::DEBUG);
             subnodes = new QuadTreeNode<T, N>[4];
             isLeafNode_ = false;
             distributeRectCoverageToSubnodes();
             setParentOfSubnodes();
+            setSubnodeHeading();
         } else {
-            logger->log("Already split...", p2d::debug::LogLevel::DEBUG);
+            //logger->log("Already split...", p2d::debug::LogLevel::DEBUG);
+            ;
         }
-        
     } // subdivide
 
     template <typename T, uint N>
@@ -81,6 +88,11 @@ namespace p2d { namespace utility {
     } // subdivide
 
     template <typename T, uint N>
+    void QuadTreeNode<T, N>::setHeading(const SubQuad& subnodeHeading) {
+        heading = subnodeHeading;
+    } // subdivide
+
+    template <typename T, uint N>
     void QuadTreeNode<T, N>::setRectCoverage(const Rect<float>& rect) {
         coverage = rect;
     } // setRectCoverage
@@ -89,6 +101,20 @@ namespace p2d { namespace utility {
     bool QuadTreeNode<T, N>::coversPoint(const p2d::math::Vector2f& point) const {
         return coverage.contains(point);
     } // coversPoint
+
+    template <typename T, uint N>
+    QuadTreeNode<T, N>& QuadTreeNode<T, N>::findNodeContaining(const p2d::math::Vector2f& point) {
+        for (unsigned int i = 0; i < 4; i++) {
+            if (subnodes[i].coversPoint(point)) {
+                if (subnodes[i].isLeafNode()) {
+                    return subnodes[i];
+                } else {
+                    return subnodes[i].findNodeContaining(point);
+                } // if
+            } // if
+        } // for
+        return *this;
+    } // findNodeContaining
 
     template <typename T, uint N>
     QuadTreeNode<T, N>& QuadTreeNode<T, N>::operator[] (const SubQuad& which) {
@@ -110,6 +136,14 @@ namespace p2d { namespace utility {
         subnodes[1].setParent(this);
         subnodes[2].setParent(this);
         subnodes[3].setParent(this);
+    } // distributeRectCoverageToSubnodes
+
+    template <typename T, uint N>
+    void QuadTreeNode<T, N>::setSubnodeHeading() {
+        subnodes[0].setHeading(SubQuad::NW);
+        subnodes[1].setHeading(SubQuad::NE);
+        subnodes[2].setHeading(SubQuad::SE);
+        subnodes[3].setHeading(SubQuad::SW);
     } // distributeRectCoverageToSubnodes
 } // utility
 } // p2d
