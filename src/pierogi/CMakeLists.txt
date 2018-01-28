@@ -25,6 +25,7 @@ target_link_libraries(p2d-core PUBLIC
     p2d-debug
     p2d-input
     p2d-math
+    p2d-utility
     )
 
 target_include_directories(p2d-core PUBLIC

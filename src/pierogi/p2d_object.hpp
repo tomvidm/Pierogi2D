@@ -9,6 +9,7 @@ namespace p2d {
         Object();
         Object(const Object& other);
         void setPosition(const math::Vector2f& pos);
+        void setPosition(const float& x, const float& y);
         math::Vector2f getPosition() const;
     private:
         math::Vector2f position;

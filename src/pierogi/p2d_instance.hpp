@@ -30,18 +30,8 @@ namespace p2d {
         p2d::input::Event event;
         p2d::Clock clk;
 
-        p2d::utility::Rect<float> rect = p2d::utility::Rect<float>(10.f, 10.f, 600.f, 400.f);
-        p2d::utility::QuadTreeNode<Object, 1> qtree;
+        p2d::utility::QuadTree<4>* qtreePtr;
         std::vector<Object> objects;
-        
-        Object o1; 
-        Object o2;
-        Object o3;
-        Object o4;
-        Object o5;
-        Object o6;
-        Object o7;
-        Object o8;
 
         uint framePeriod_ = 100;
         bool isRunning_ = true;

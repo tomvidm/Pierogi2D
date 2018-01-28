@@ -22,6 +22,7 @@ target_link_libraries(p2d-unittests
     p2d-core
     p2d-graphics
     p2d-math
+    p2d-utility
     )
 
 target_include_directories(p2d-unittests PUBLIC 

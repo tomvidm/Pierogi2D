@@ -6,9 +6,6 @@ namespace p2d {
         if (!init()) {
             std::cout << "Initialization failed!" << std::endl;
         } // if
-
-        using p2d::math::Vector2f;
-        qtree.setRectCoverage(rect);
     } // constructor
 
     Instance::~Instance() {
@@ -16,6 +13,9 @@ namespace p2d {
     } // constructor
 
     void Instance::run() {
+        p2d::utility::Rect<float> qtreeCoverage(16.f, 16.f, 600, 400);
+        qtreePtr = new p2d::utility::QuadTree<4> (qtreeCoverage);
+        objects.reserve(1000);
         while (isRunning()) {
             handleInput();
             render();
@@ -29,24 +29,25 @@ namespace p2d {
                 isRunning_ = false;
             } // if
             if (event.eventType == p2d::input::EventType::MOUSE_BUTTON_PRESS) {
-                Object obj;
-                obj.setPosition(event.mouseEvent.position.getFloatified());
-                objects.push_back(obj);
-                qtree.insert(&(objects[objects.size() - 1]));
-                }
+                math::Vector2f pos = event.mouseEvent.position.getFloatified();
+                objects.push_back(Object());
+                objects[objects.size() - 1].setPosition(pos);
+                qtreePtr->insert(objects[objects.size() - 1]);
+            }
         } // while
     } // handleInput
 
     void Instance::render() {
         if (clk.getElapsedTime() > framePeriod_) {
             clk.reset();
-            SDL_SetRenderDrawColor(renderWindow.getRenderer(), 92, 92, 92, 255);
+            SDL_SetRenderDrawColor(renderWindow.getRenderer(), 0, 0, 0, 255);
             SDL_RenderClear(renderWindow.getRenderer());
-            qtree.draw(renderWindow.getRenderer());
+            qtreePtr->draw(renderWindow.getRenderer());
+            SDL_SetRenderDrawColor(renderWindow.getRenderer(), 255, 0, 0, 255);
             for (auto obj : objects) {
-                int x = obj.getPosition().getIntified().getX();
-                int y = obj.getPosition().getIntified().getY();
-                SDL_RenderDrawPoint(renderWindow.getRenderer(), x, y);
+                SDL_RenderDrawPoint(renderWindow.getRenderer(),
+                    obj.getPosition().getIntified().getX(),
+                    obj.getPosition().getIntified().getY());
             }
             SDL_RenderPresent(renderWindow.getRenderer());
         } // if

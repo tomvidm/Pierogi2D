@@ -13,6 +13,10 @@ namespace p2d {
         position = pos;
     } // setPosition
 
+    void Object::setPosition(const float& x, const float& y) {
+        position = math::Vector2f(x, y);
+    } // setPosition
+
     math::Vector2f Object::getPosition() const {
         return position;
     } // getPosition
