@@ -21,7 +21,6 @@ namespace p2d { namespace debug {
     public:
         void log(const String& logString, const LogLevel logLevel = LogLevel::EXTREMELY_VERBOSE) const;
         void setLogLevel(const LogLevel& newLogLevel);
-
         static Logger* getInstancePtr();
         ~Logger();
     protected:

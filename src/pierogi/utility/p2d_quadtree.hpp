@@ -3,8 +3,11 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 
 #include "p2d_rect.hpp"
+
+#include "p2d_stringutils.hpp"
 
 #include "../debug/p2d_logger.hpp"
 
@@ -35,7 +38,7 @@ namespace p2d { namespace utility {
         void subdivide();
         bool isLeafNode() const;
 
-        void insert(const T& obj);
+        void insert(T& obj);
 
         void setRectCoverage(const Rect<float>& rect);
         bool coversPoint(const p2d::math::Vector2f& point) const;
@@ -44,11 +47,14 @@ namespace p2d { namespace utility {
         std::vector<T*> containedObjects();
 
         QuadTreeNode& operator[] (const SubQuad& which);
+
+        std::string generateDebugString() const;
     protected:
         void setParent(QuadTreeNode* newParentPtr);
         void setHeading(const SubQuad& heading);
     private:
         bool isLeafNode_ = true;
+        uint treeDepth = 0;
         const unsigned int capacity;
         std::vector<T*> container;
         Rect<float> coverage;
@@ -59,7 +65,9 @@ namespace p2d { namespace utility {
         void distributeRectCoverageToSubnodes();
         void setParentOfSubnodes();
         void setSubnodeHeading();
-        // void distributeObjectsToSubnodes();
+        void updateDepths();
+        void setDepth(uint depth = 0);
+        void distributeObjectsToSubnodes();
 
         p2d::debug::Logger* logger;
     }; // QuadTreeTree
@@ -80,6 +88,7 @@ namespace p2d { namespace utility {
             distributeRectCoverageToSubnodes();
             setParentOfSubnodes();
             setSubnodeHeading();
+            updateDepths();
         } else {
             //logger->log("Already split...", p2d::debug::LogLevel::DEBUG);
             ;
@@ -92,22 +101,17 @@ namespace p2d { namespace utility {
     } // subdivide
 
     template <typename T, uint N>
-    void QuadTreeNode<T, N>::insert(const T& obj) {
+    void QuadTreeNode<T, N>::insert(T& obj) {
         if (container.size() < capacity) {
+            logger->log("Inserting object at leaf...", p2d::debug::LogLevel::DEBUG);
             container.push_back(&obj);
         } else {
+            logger->log("Subdividing to find place for object...", p2d::debug::LogLevel::DEBUG);
             subdivide();
-            // distributeObjectsToSubnodes();
-            // findNodeContaining(obj.getPosition()).insert(obj);
-        }
-    }
-
-/*    template <typename T, uint N>
-    void distributeObjectsToSubnodes() {
-        for (auto objPtr : container) {
-            findNodeContaining.insert(//obj ref)
-        } // for
-    } // distributeObjectsToSubnodes*/
+            distributeObjectsToSubnodes();
+            findNodeContaining(obj.getPosition()).insert(obj);
+        } // if else
+    } // insert
 
     template <typename T, uint N>
     void QuadTreeNode<T, N>::setParent(QuadTreeNode* newParentPtr) {
@@ -186,6 +190,44 @@ namespace p2d { namespace utility {
         subnodes[2].setHeading(SubQuad::SE);
         subnodes[3].setHeading(SubQuad::SW);
     } // distributeRectCoverageToSubnodes
+
+    template <typename T, uint N>
+    void QuadTreeNode<T, N>::updateDepths() {
+        for (uint i = 0; i < 4; i++) {
+            subnodes[i].setDepth(treeDepth + 1);
+        }
+    }
+
+    template <typename T, uint N>
+    void QuadTreeNode<T, N>::setDepth(uint depth) {
+        treeDepth = depth;
+        if (!isLeafNode()) {
+            for (uint i = 0; i < 4; i++) {
+                subnodes[i].setDepth(treeDepth + 1);
+            }// for
+        } // if 
+    } // setDepth
+
+    template <typename T, uint N>
+    void QuadTreeNode<T, N>::distributeObjectsToSubnodes() {
+        for (auto objPtr : container) {
+            findNodeContaining(objPtr->getPosition()).insert(*objPtr);
+        } // for
+        container.clear();
+    }
+
+    template <typename T, uint N>
+    std::string QuadTreeNode<T, N>::generateDebugString() const {
+        std::string str = ntabs(treeDepth);
+        str = str + "* Node\n" + 
+                     ntabs(treeDepth) + "| Objects = " + std::to_string(container.size()) + "\n";
+        if (!isLeafNode()) {
+            for (uint i = 0; i < 4; i++) {
+                str = str + subnodes[i].generateDebugString();
+            } // for
+        } // if
+        return str; 
+    } // generateDebugString
 } // utility
 } // p2d
 

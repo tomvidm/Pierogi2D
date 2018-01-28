@@ -13,6 +13,8 @@ namespace p2d { namespace utility {
     public:
         Rect();
         Rect(const Vector2<T>& pos, const Vector2<T>& siz);
+        Rect(const float& x, const float& y, 
+             const float& w, const float& h);
 
         bool contains(const Vector2<T>& point) const;
 
@@ -34,6 +36,14 @@ namespace p2d { namespace utility {
     template <typename T>
     Rect<T>::Rect(const Vector2<T>& pos, const Vector2<T>& siz) 
     : origin(pos), size(siz) {
+        ;
+    } // constructor
+
+    template <typename T>
+    Rect<T>::Rect(const float& x, const float& y, 
+             const float& w, const float& h)
+    : origin(Vector2<float>(x, y)),
+      size(Vector2<float>(w, h)) {
         ;
     } // constructor
 

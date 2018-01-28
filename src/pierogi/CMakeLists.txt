@@ -4,11 +4,13 @@ add_subdirectory(debug)
 add_subdirectory(graphics)
 add_subdirectory(math)
 add_subdirectory(input)
+add_subdirectory(utility)
 
 add_library(p2d-core
     p2d_window.cpp
     p2d_clock.cpp
     p2d_instance.cpp
+    p2d_object.cpp
     )
 
 set_target_properties(p2d-core
