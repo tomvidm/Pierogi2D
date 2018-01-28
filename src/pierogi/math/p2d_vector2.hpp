@@ -24,6 +24,7 @@ namespace p2d { namespace math {
 
         T dot(const Vector2<T>& other) const;
 
+        Vector2<int> getIntified() const;
         Vector2<float> getFloatified() const;
         Vector2<float> getNormalized() const;
 
@@ -105,6 +106,12 @@ namespace p2d { namespace math {
     T Vector2<T>::dot(const Vector2<T>& other) const {
         return (x_ * other.getX()) + (y_ * other.getY());
     } // dot
+
+    template <typename T>
+    Vector2<int> Vector2<T>::getIntified() const {
+        return Vector2<int>(static_cast<int>(x_),
+                              static_cast<int>(y_));
+    } // getFloatified
 
     template <typename T>
     Vector2<float> Vector2<T>::getFloatified() const {

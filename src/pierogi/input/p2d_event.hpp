@@ -21,6 +21,7 @@ namespace p2d { namespace input {
     struct Event {
         Event();
         Event(const EventType& eventType);
+        Event(const EventType& eventType, const MouseEvent& mouseEvent);
         Event(const Event& other);
         EventType eventType;
         Uint32 timestamp;

@@ -11,6 +11,13 @@ namespace p2d { namespace input {
         ;
     } // constructor
 
+    Event::Event(const EventType& eventType, const MouseEvent& mouseEvent) 
+    : eventType(eventType),
+      mouseEvent(mouseEvent),
+      timestamp(SDL_GetTicks()) {
+        ;
+    } // copy constructor
+
     Event::Event(const Event& other) 
     : eventType(other.eventType),
       timestamp(other.timestamp) {
@@ -25,5 +32,6 @@ namespace p2d { namespace input {
                 break;
         } // switch
     } // copy constructor
+
 } // namespace input
 } // namespace p2d

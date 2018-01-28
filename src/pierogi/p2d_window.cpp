@@ -4,8 +4,7 @@ namespace p2d {
     // TODO: Break up into smaller functions
     // TODO: Fix error handling
     RenderWindow::RenderWindow() {
-        initSDL();
-        initWindow();
+        ;
     } // RenderWindow
 
     RenderWindow::~RenderWindow() {
@@ -15,6 +14,7 @@ namespace p2d {
     } // ~RenderWindow
 
     bool RenderWindow::initSDL() {
+        std::cout << "SDL_Init" << std::endl;
         if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
             std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
             return false;
@@ -23,6 +23,7 @@ namespace p2d {
     } // initSDL
 
     bool RenderWindow::initWindow() {
+        std::cout << "SDL_CreateWindow" << std::endl;
         sdlWindowPtr = SDL_CreateWindow(
             "Default Window",
             900, 100,
@@ -40,10 +41,10 @@ namespace p2d {
     } // initWindow
 
     bool RenderWindow::initRenderer() {
+        std::cout << "SDL_CreateRenderer" << std::endl;
         sdlRendererPtr = SDL_CreateRenderer(
             sdlWindowPtr,
-            -1,
-            SDL_RENDERER_PRESENTVSYNC
+            -1, 0
         ); // SDL_CreateRenderer
 
         if (sdlRendererPtr == nullptr) {

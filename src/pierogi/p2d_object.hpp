@@ -6,6 +6,8 @@
 namespace p2d {
     class Object {
     public:
+        Object();
+        Object(const Object& other);
         void setPosition(const math::Vector2f& pos);
         math::Vector2f getPosition() const;
     private:

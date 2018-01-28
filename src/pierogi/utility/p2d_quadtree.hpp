@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 
+#include "SDL.h"
 #include "p2d_rect.hpp"
 
 #include "p2d_stringutils.hpp"
@@ -35,9 +36,11 @@ namespace p2d { namespace utility {
     class QuadTreeNode {
     public:
         QuadTreeNode();
+        ~QuadTreeNode();
         void subdivide();
         bool isLeafNode() const;
 
+        void insert(T* obj);
         void insert(T& obj);
 
         void setRectCoverage(const Rect<float>& rect);
@@ -47,6 +50,8 @@ namespace p2d { namespace utility {
         std::vector<T*> containedObjects();
 
         QuadTreeNode& operator[] (const SubQuad& which);
+
+        void draw(SDL_Renderer* renderer);
 
         std::string generateDebugString() const;
     protected:
@@ -80,6 +85,12 @@ namespace p2d { namespace utility {
     } // constructor
 
     template <typename T, uint N>
+    QuadTreeNode<T, N>::~QuadTreeNode() {
+        ;//delete [] subnodes;
+        // Memory access error when deleting
+    }
+
+    template <typename T, uint N>
     void QuadTreeNode<T, N>::subdivide() {
         if (isLeafNode()) {
             logger->log("Splitting leaf node...", p2d::debug::LogLevel::DEBUG);
@@ -90,7 +101,7 @@ namespace p2d { namespace utility {
             setSubnodeHeading();
             updateDepths();
         } else {
-            //logger->log("Already split...", p2d::debug::LogLevel::DEBUG);
+            logger->log("Already split...", p2d::debug::LogLevel::DEBUG);
             ;
         }
     } // subdivide
@@ -101,6 +112,20 @@ namespace p2d { namespace utility {
     } // subdivide
 
     template <typename T, uint N>
+    void QuadTreeNode<T, N>::insert(T* objPtr) {
+        if (container.size() < capacity) {
+            logger->log("Inserting object at leaf...", p2d::debug::LogLevel::DEBUG);
+            container.push_back(objPtr);
+        } else {
+            logger->log("Subdividing to find place for object...", p2d::debug::LogLevel::DEBUG);
+            subdivide();
+            //distributeObjectsToSubnodes();
+            findNodeContaining(objPtr->getPosition()).insert(objPtr);
+            
+        } // if else
+    } // insert
+
+    template <typename T, uint N>
     void QuadTreeNode<T, N>::insert(T& obj) {
         if (container.size() < capacity) {
             logger->log("Inserting object at leaf...", p2d::debug::LogLevel::DEBUG);
@@ -108,7 +133,7 @@ namespace p2d { namespace utility {
         } else {
             logger->log("Subdividing to find place for object...", p2d::debug::LogLevel::DEBUG);
             subdivide();
-            distributeObjectsToSubnodes();
+            //distributeObjectsToSubnodes();
             findNodeContaining(obj.getPosition()).insert(obj);
         } // if else
     } // insert
@@ -210,11 +235,25 @@ namespace p2d { namespace utility {
 
     template <typename T, uint N>
     void QuadTreeNode<T, N>::distributeObjectsToSubnodes() {
+        std::cout << container.size() << std::endl;
         for (auto objPtr : container) {
-            findNodeContaining(objPtr->getPosition()).insert(*objPtr);
+            findNodeContaining(objPtr->getPosition()).insert(objPtr);
         } // for
         container.clear();
+        std::cout << container.size() << std::endl;
     }
+
+    template <typename T, uint N>
+    void QuadTreeNode<T, N>::draw(SDL_Renderer* renderer) {
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_Rect rect = coverage.getSDLRect();
+        SDL_RenderDrawRect(renderer, &rect);
+        if (!isLeafNode()) {
+            for (uint i = 0; i < 4; i++) {
+                subnodes[i].draw(renderer);
+            } // for
+        } // if
+    } // draw
 
     template <typename T, uint N>
     std::string QuadTreeNode<T, N>::generateDebugString() const {

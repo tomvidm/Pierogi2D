@@ -92,10 +92,12 @@ namespace p2d { namespace utility {
 
     template <typename T>
     SDL_Rect Rect<T>::getSDLRect() const {
-        return SDL_Rect(static_cast<int>(origin.getX()),
-                        static_cast<int>(origin.getY()),
-                        static_cast<int>(size.getX()),
-                        static_cast<int>(size.getY()));
+        SDL_Rect result;
+        result.x = static_cast<int>(origin.getX());
+        result.y = static_cast<int>(origin.getY());
+        result.w = static_cast<int>(size.getX());
+        result.h = static_cast<int>(size.getY());
+        return result;
     }
 } // namespace utility
 } // namespace p2d

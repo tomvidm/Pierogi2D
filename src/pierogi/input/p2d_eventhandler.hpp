@@ -2,6 +2,7 @@
 #define P2D_EVENTHANDLER_HPP
 
 #include <queue>
+#include <iostream>
 
 #include "SDL.h"
 

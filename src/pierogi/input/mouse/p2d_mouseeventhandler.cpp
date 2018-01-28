@@ -18,10 +18,12 @@ namespace p2d { namespace input {
             default:
                 break;
         } // switch
-
-        mouseStatePtr->setMousePosition(Vector2i(sdlMouseButtonEvent.x,
-                                                 sdlMouseButtonEvent.y));
-        return Event(EventType::NONE);
+        MouseEvent mouseEvent;
+        mouseEvent.position = Vector2i(sdlMouseButtonEvent.x,
+                                       sdlMouseButtonEvent.y);
+        std::cout << mouseEvent.position.getX() << std::endl;
+        return Event(EventType::MOUSE_BUTTON_PRESS,
+                     mouseEvent);
     } // onButtonPress
 
     Event MouseEventHandler::onButtonRelease(const SDL_MouseButtonEvent& sdlMouseButtonEvent) {
