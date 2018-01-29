@@ -109,7 +109,6 @@ namespace p2d { namespace utility {
             isLeafNode_ = false;
             setParentOfSubnodes();
             setDepth();
-            distributeObjectsToSubnodes();
         } // if
     } // subdivide
 
@@ -127,6 +126,8 @@ namespace p2d { namespace utility {
             } else {
                 std::cout << "Container capacity reached. Time for S U B D I V I S I O N" << std::endl;
                 subdivide();
+                findNodeContaining(objPtr->getPosition())->insert(objPtr);
+                distributeObjectsToSubnodes();
             } // if else
         } else {
             findNodeContaining(objPtr->getPosition())->insert(objPtr);

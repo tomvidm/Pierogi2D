@@ -14,7 +14,7 @@ namespace p2d {
 
     void Instance::run() {
         p2d::utility::Rect<float> qtreeCoverage(16.f, 16.f, 600, 400);
-        qtreePtr = new p2d::utility::QuadTree<4> (qtreeCoverage);
+        qtreePtr = new p2d::utility::QuadTree<1> (qtreeCoverage);
         objects.reserve(1000);
         while (isRunning()) {
             handleInput();

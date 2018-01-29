@@ -10,6 +10,8 @@
 #include "p2d_object.hpp"
 #include "p2d_window.hpp"
 
+#include <memory>
+
 namespace p2d {
     class Instance {
     public:
@@ -30,8 +32,8 @@ namespace p2d {
         p2d::input::Event event;
         p2d::Clock clk;
 
-        p2d::utility::QuadTree<4>* qtreePtr;
-        std::vector<Object> objects;
+        p2d::utility::QuadTree<1>* qtreePtr;
+        std::vector<Object> objects; // Use smart pointers to avoid stupid reallocation bug.
 
         uint framePeriod_ = 100;
         bool isRunning_ = true;
