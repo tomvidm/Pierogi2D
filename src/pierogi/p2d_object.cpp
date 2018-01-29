@@ -17,6 +17,10 @@ namespace p2d {
         position = math::Vector2f(x, y);
     } // setPosition
 
+    void Object::move(const math::Vector2f& vel) {
+        position += vel;
+    }
+
     math::Vector2f Object::getPosition() const {
         return position;
     } // getPosition

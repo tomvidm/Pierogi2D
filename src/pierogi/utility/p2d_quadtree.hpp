@@ -21,6 +21,7 @@ namespace p2d { namespace utility {
         void insert(p2d::Object& obj);        
 
         inline QuadTreeNode<N>* getRoot() { return rootNode; }
+        inline Rect<float> getCoverage() const { return rootNode->getCoverage(); }
 
         void draw(SDL_Renderer* renderer) const;
     private:

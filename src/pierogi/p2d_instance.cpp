@@ -14,11 +14,16 @@ namespace p2d {
 
     void Instance::run() {
         p2d::utility::Rect<float> qtreeCoverage(16.f, 16.f, 600, 400);
-        qtreePtr = new p2d::utility::QuadTree<1> (qtreeCoverage);
-        objects.reserve(1000);
+        qtreePtr = new p2d::utility::QuadTree<QUADTREE_NODE_OBJECT_CAPACITY> (qtreeCoverage);
+        clk.reset();
         while (isRunning()) {
             handleInput();
-            render();
+            if (clk.getElapsedTime() > 33) {
+                float dt = clk.getElapsedSeconds();
+                clk.reset();
+                update(dt);
+                render();
+            }
         } // while
     } // run
 
@@ -30,27 +35,33 @@ namespace p2d {
             } // if
             if (event.eventType == p2d::input::EventType::MOUSE_BUTTON_PRESS) {
                 math::Vector2f pos = event.mouseEvent.position.getFloatified();
-                objects.push_back(Object());
-                objects[objects.size() - 1].setPosition(pos);
-                qtreePtr->insert(objects[objects.size() - 1]);
+                if (!qtreePtr->getCoverage().contains(pos)) {
+                    continue;
+                } // if
+                objects.push_back(std::make_shared<Object>());
+                objects[objects.size() - 1]->setPosition(pos);
+                qtreePtr->insert(*objects[objects.size() - 1]);
             }
         } // while
     } // handleInput
 
+    void Instance::update(float dt) {
+        for (auto objPtr : objects) {
+            ;//objPtr->move(math::Vector2f(10.f, 0.f) * dt);
+        } // for
+    } // move
+
     void Instance::render() {
-        if (clk.getElapsedTime() > framePeriod_) {
-            clk.reset();
-            SDL_SetRenderDrawColor(renderWindow.getRenderer(), 0, 0, 0, 255);
-            SDL_RenderClear(renderWindow.getRenderer());
-            qtreePtr->draw(renderWindow.getRenderer());
-            SDL_SetRenderDrawColor(renderWindow.getRenderer(), 255, 0, 0, 255);
-            for (auto obj : objects) {
-                SDL_RenderDrawPoint(renderWindow.getRenderer(),
-                    obj.getPosition().getIntified().getX(),
-                    obj.getPosition().getIntified().getY());
-            }
-            SDL_RenderPresent(renderWindow.getRenderer());
-        } // if
+        SDL_SetRenderDrawColor(renderWindow.getRenderer(), 0, 0, 0, 255);
+        SDL_RenderClear(renderWindow.getRenderer());
+        qtreePtr->draw(renderWindow.getRenderer());
+        SDL_SetRenderDrawColor(renderWindow.getRenderer(), 255, 0, 0, 255);
+        for (auto obj : objects) {
+            SDL_RenderDrawPoint(renderWindow.getRenderer(),
+                obj->getPosition().getIntified().getX(),
+                obj->getPosition().getIntified().getY());
+        }
+        SDL_RenderPresent(renderWindow.getRenderer());
     } // render
 
     bool Instance::init() {

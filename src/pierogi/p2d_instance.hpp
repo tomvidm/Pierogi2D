@@ -3,6 +3,7 @@
 
 #include "p2d_logger.hpp"
 #include "p2d_clock.hpp"
+#include "p2d_compiletimeconstants.hpp"
 #include "p2d_eventhandler.hpp"
 #include "p2d_logger.hpp"
 #include "p2d_typedefs.hpp"
@@ -24,6 +25,7 @@ namespace p2d {
     private:
         bool init();
         void handleInput();
+        void update(float dt);
         void render();
         p2d::RenderWindow renderWindow;
         p2d::input::EventHandler eventHandler;
@@ -32,8 +34,8 @@ namespace p2d {
         p2d::input::Event event;
         p2d::Clock clk;
 
-        p2d::utility::QuadTree<1>* qtreePtr;
-        std::vector<Object> objects; // Use smart pointers to avoid stupid reallocation bug.
+        p2d::utility::QuadTree<QUADTREE_NODE_OBJECT_CAPACITY>* qtreePtr;
+        std::vector<std::shared_ptr<Object>> objects; // Use smart pointers to avoid stupid reallocation bug.
 
         uint framePeriod_ = 100;
         bool isRunning_ = true;

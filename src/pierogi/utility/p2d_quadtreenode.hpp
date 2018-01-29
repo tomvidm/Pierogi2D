@@ -44,13 +44,18 @@ namespace p2d { namespace utility {
         void insert(p2d::Object* obj);
         void insert(p2d::Object& obj);
 
+        inline Rect<float> getCoverage() const { return coverage; }
         void setRectCoverage(const Rect<float>& rect);
         bool coversPoint(const p2d::math::Vector2f& point) const;
 
         QuadTreeNode* findNodeContaining(const p2d::math::Vector2f& point);
+        QuadTreeNode* getNorth();
+        QuadTreeNode* getEast();
+        QuadTreeNode* getSouth();
+        QuadTreeNode* getWest();
         std::vector<p2d::Object*> containedObjects();
 
-        QuadTreeNode& operator[] (const SubQuad& which);
+        QuadTreeNode* get(const SubQuad& which);
 
         void draw(SDL_Renderer* renderer) const;
 
@@ -60,9 +65,11 @@ namespace p2d { namespace utility {
     private:
         bool isLeafNode_ = true;
         uint treeDepth = 0;
+        uint numObjectsContained = 0;
         const unsigned int capacity;
         std::vector<p2d::Object*> container;
         Rect<float> coverage;
+
         QuadTreeNode* parentPtr = nullptr;
         QuadTreeNode* quadNW;
         QuadTreeNode* quadSW;
@@ -132,6 +139,8 @@ namespace p2d { namespace utility {
         } else {
             findNodeContaining(objPtr->getPosition())->insert(objPtr);
         } // if else
+
+        numObjectsContained++;
     } // insert
 
     template <uint N>
@@ -193,6 +202,50 @@ namespace p2d { namespace utility {
     } // findNodeContaining
 
     template <uint N>
+    QuadTreeNode<N>* QuadTreeNode<N>::getNorth() {
+        if (heading == SubQuad::SW) {
+            return parentPtr->get(SubQuad::NW);
+        } else if (heading == SubQuad::SE) {
+            return parentPtr->get(SubQuad::NE);
+        } else if (heading == SubQuad::NW || heading == SubQuad::NE) {
+            return this; // Need to develop a good way to do this
+        }
+    }
+
+    template <uint N>
+    QuadTreeNode<N>* QuadTreeNode<N>::getEast() {
+        if (heading == SubQuad::NW) {
+            return parentPtr->get(SubQuad::NE);
+        } else if (heading == SubQuad::SW) {
+            return parentPtr->get(SubQuad::SE);
+        } else if (heading == SubQuad::NE || heading == SubQuad::SE) {
+            return this; // Need to develop a good way to do this
+        }
+    }
+
+    template <uint N>
+    QuadTreeNode<N>* QuadTreeNode<N>::getSouth() {
+        if (heading == SubQuad::NW) {
+            return parentPtr->get(SubQuad::SW);
+        } else if (heading == SubQuad::NE) {
+            return parentPtr->get(SubQuad::SE);
+        } else if (heading == SubQuad::SW || heading == SubQuad::SE) {
+            return this; // Need to develop a good way to do this
+        }
+    }
+
+    template <uint N>
+    QuadTreeNode<N>* QuadTreeNode<N>::getWest() {
+        if (heading == SubQuad::NE) {
+            return parentPtr->get(SubQuad::NW);
+        } else if (heading == SubQuad::SE) {
+            return parentPtr->get(SubQuad::SW);
+        } else if (heading == SubQuad::NE || heading == SubQuad::SE) {
+            return this; // Need to develop a good way to do this
+        }
+    }
+
+    template <uint N>
     std::vector<p2d::Object*> QuadTreeNode<N>::containedObjects() {
         if (isLeafNode()) {
             return container;
@@ -207,9 +260,17 @@ namespace p2d { namespace utility {
     } // containedObjects
 
     template <uint N>
-    QuadTreeNode<N>& QuadTreeNode<N>::operator[] (const SubQuad& which) {
-        return subnodes[static_cast<uint>(which)];
-    } // operator []
+    QuadTreeNode<N>* QuadTreeNode<N>::get(const SubQuad& which) {
+        if (which == SubQuad::NW) {
+            return quadNW;
+        } else if (which == SubQuad::SW) {
+            return quadSW;
+        } else if (which == SubQuad::NE) {
+            return quadNE;
+        } else (which == SubQuad::SE) {
+            return quadSE;
+        }
+    } // get
 
     template <uint N>
     void QuadTreeNode<N>::setParentOfSubnodes() {
