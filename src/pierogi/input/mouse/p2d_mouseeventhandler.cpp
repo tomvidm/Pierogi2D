@@ -5,20 +5,25 @@
 namespace p2d { namespace input {
     Event MouseEventHandler::onButtonPress(const SDL_MouseButtonEvent& sdlMouseButtonEvent) {
         debug::Logger::getInstancePtr()->log("onButtonPress");
+        MouseEvent mouseEvent;
+
         switch (sdlMouseButtonEvent.button) {
             case SDL_BUTTON_LEFT:
                 mouseStatePtr->setButtonPressState(MouseButton::LEFT, true);
+                mouseEvent.button = MouseButton::LEFT;
                 break;
             case SDL_BUTTON_MIDDLE:
                 mouseStatePtr->setButtonPressState(MouseButton::MIDDLE, true);  
+                mouseEvent.button = MouseButton::MIDDLE;
                 break;
             case SDL_BUTTON_RIGHT:
                 mouseStatePtr->setButtonPressState(MouseButton::RIGHT, true);
+                mouseEvent.button = MouseButton::RIGHT;
                 break;
             default:
                 break;
         } // switch
-        MouseEvent mouseEvent;
+        
         mouseEvent.position = Vector2i(sdlMouseButtonEvent.x,
                                        sdlMouseButtonEvent.y);
         std::cout << mouseEvent.position.getX() << std::endl;

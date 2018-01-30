@@ -27,6 +27,7 @@ namespace p2d { namespace utility {
         std::shared_ptr<QuadTreeNode<T>> findSmallestQuadContaining(const p2d::math::Vector2f& position);
 
         void subdivByPosition(const p2d::math::Vector2f& position);
+        void desubdivByPosition(const p2d::math::Vector2f& position);
 
         inline bool isLeafNode() const { return isLeafNode_; }
         inline bool containsPoint(const p2d::math::Vector2f& position) const { return coverage.contains(position); }
@@ -46,6 +47,7 @@ namespace p2d { namespace utility {
 
     public:
         void subdiv();
+        void desubdiv();
     }; // QuadTreeNode
 
     template <typename T>
@@ -114,6 +116,12 @@ namespace p2d { namespace utility {
     }
 
     template <typename T>
+    void QuadTreeNode<T>::desubdivByPosition(const p2d::math::Vector2f& position){
+        findSmallestQuadContaining(position)->desubdiv();   
+    }
+
+
+    template <typename T>
     void QuadTreeNode<T>::subdiv() {
         if (isLeafNode()) {
             isLeafNode_ = false;
@@ -126,6 +134,19 @@ namespace p2d { namespace utility {
             return;
         } // if else
     } // subdiv
+
+    template <typename T>
+    void QuadTreeNode<T>::desubdiv() {
+        if (isLeafNode() && !(parentPtr == nullptr)) {
+            parentPtr->desubdiv();
+        } else {
+            isLeafNode_ = true;
+            for (uint q = 0; q < NUM_SUBQUADS; q++) {
+                // Collect all objects here!
+                subnodes[q].reset();
+            } // for
+        } // if else
+    }
 
     template <typename T>
     void QuadTreeNode<T>::draw(SDL_Renderer* renderer) const {
