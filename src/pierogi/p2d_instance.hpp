@@ -10,10 +10,14 @@
 #include "p2d_utility.hpp"
 #include "p2d_object.hpp"
 #include "p2d_window.hpp"
+#include "quadtreenode.hpp"
 
 #include <memory>
 
 namespace p2d {
+    using p2d::utility::QuadTreeNode;
+    using p2d::Object;
+
     class Instance {
     public:
         Instance();
@@ -31,8 +35,11 @@ namespace p2d {
         p2d::input::EventHandler eventHandler;
         p2d::debug::Logger* logger;
 
+        std::shared_ptr<QuadTreeNode<Object>> rootNodePtr;
+        std::shared_ptr<QuadTreeNode<Object>> rootNodePtr2;
         p2d::input::Event event;
         p2d::Clock clk;
+        math::Vector2f mousePos;
 
         std::vector<std::shared_ptr<Object>> objects; // Use smart pointers to avoid stupid reallocation bug.
 

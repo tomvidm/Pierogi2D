@@ -6,6 +6,8 @@ namespace p2d {
         if (!init()) {
             std::cout << "Initialization failed!" << std::endl;
         } // if
+
+       
     } // constructor
 
     Instance::~Instance() {
@@ -13,7 +15,8 @@ namespace p2d {
     } // constructor
 
     void Instance::run() {
-        p2d::utility::Rect<float> qtreeCoverage(16.f, 16.f, 700, 500);
+        p2d::utility::Rect<float> rect(64.f, 64.f, 640.f, 480.f);
+        rootNodePtr = std::make_shared<QuadTreeNode<Object>>(rect);
 
         clk.reset();
         while (isRunning()) {
@@ -34,10 +37,8 @@ namespace p2d {
                 isRunning_ = false;
             } // if
             if (event.eventType == p2d::input::EventType::MOUSE_BUTTON_PRESS) {
-                math::Vector2f pos = event.mouseEvent.position.getFloatified();
-                std::shared_ptr<Object> newObject = std::make_shared<Object>();
-                objects.push_back(newObject);
-                newObject->setPosition(pos);
+                mousePos = event.mouseEvent.position.getFloatified();
+                rootNodePtr->subdivByPosition(mousePos);
             }
         } // while
     } // handleInput
@@ -51,11 +52,16 @@ namespace p2d {
     void Instance::render() {
         SDL_SetRenderDrawColor(renderWindow.getRenderer(), 0, 0, 0, 255);
         SDL_RenderClear(renderWindow.getRenderer());
-        SDL_SetRenderDrawColor(renderWindow.getRenderer(), 255, 0, 0, 255);
+        SDL_SetRenderDrawColor(renderWindow.getRenderer(), 255, 255, 255, 255);
+        rootNodePtr->draw(renderWindow.getRenderer());
         for (auto obj : objects) {
             SDL_RenderDrawPoint(renderWindow.getRenderer(),
                 obj->getPosition().getIntified().getX(),
                 obj->getPosition().getIntified().getY());
+        }
+        SDL_SetRenderDrawColor(renderWindow.getRenderer(), 255, 0, 0, 255);
+        if (rootNodePtr->findSmallestQuadContaining(mousePos.getFloatified()) != nullptr) {
+            rootNodePtr->findSmallestQuadContaining(mousePos.getFloatified())->draw(renderWindow.getRenderer());
         }
         SDL_RenderPresent(renderWindow.getRenderer());
     } // render
