@@ -38,9 +38,10 @@ namespace p2d {
                 if (!qtreePtr->getCoverage().contains(pos)) {
                     continue;
                 } // if
-                objects.push_back(std::make_shared<Object>());
-                objects[objects.size() - 1]->setPosition(pos);
-                qtreePtr->insert(*objects[objects.size() - 1]);
+                std::shared_ptr<Object> newObject = std::make_shared<Object>();
+                objects.push_back(newObject);
+                newObject->setPosition(pos);
+                qtreePtr->insert(newObject);
             }
         } // while
     } // handleInput

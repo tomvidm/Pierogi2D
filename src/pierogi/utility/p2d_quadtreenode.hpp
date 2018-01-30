@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <set>
 
 #include "SDL.h"
 #include "p2d_rect.hpp"
@@ -38,11 +39,14 @@ namespace p2d { namespace utility {
     public:
         QuadTreeNode(const SubQuad& quadHeading, const Rect<float>& rectCoverage);
         ~QuadTreeNode();
-        void subdivide();
+
+        void remove(p2d::Object* objPtr);
+
         bool isLeafNode() const;
 
         void insert(p2d::Object* obj);
         void insert(p2d::Object& obj);
+        void insert(std::shared_ptr<Object> objPtr);
 
         inline Rect<float> getCoverage() const { return coverage; }
         void setRectCoverage(const Rect<float>& rect);
@@ -53,7 +57,7 @@ namespace p2d { namespace utility {
         QuadTreeNode* getEast();
         QuadTreeNode* getSouth();
         QuadTreeNode* getWest();
-        std::vector<p2d::Object*> containedObjects();
+        std::set<p2d::Object*> containedObjects();
 
         QuadTreeNode* get(const SubQuad& which);
 
@@ -62,12 +66,17 @@ namespace p2d { namespace utility {
     protected:
         void setParent(QuadTreeNode* newParentPtr);
         void setHeading(const SubQuad& heading);
+
+        void decrementObjectCount();
+        
+        void subdivide();
+        void unsubdivide();
     private:
         bool isLeafNode_ = true;
         uint treeDepth = 0;
         uint numObjectsContained = 0;
         const unsigned int capacity;
-        std::vector<p2d::Object*> container;
+        std::set<p2d::Object*> container;
         Rect<float> coverage;
 
         QuadTreeNode* parentPtr = nullptr;
@@ -90,7 +99,6 @@ namespace p2d { namespace utility {
     QuadTreeNode<N>::QuadTreeNode(const SubQuad& quadHeading, const Rect<float>& rectCoverage)
     : capacity(N), heading(quadHeading), coverage(rectCoverage) {
         logger = p2d::debug::Logger::getInstancePtr();
-        container.reserve(4);
         //logger->log("QuadTreeNode constructed...", p2d::debug::LogLevel::DEBUG);
     } // constructor
 
@@ -120,6 +128,37 @@ namespace p2d { namespace utility {
     } // subdivide
 
     template <uint N>
+    void QuadTreeNode<N>::unsubdivide() {
+        if (numObjectsContained <= capacity && quadNW != nullptr) {
+            container = containedObjects();
+            delete quadNW;
+            delete quadNE;
+            delete quadSW;
+            delete quadSE;
+            isLeafNode_ = true;
+            parentPtr->unsubdivide();
+        } // if
+    } // unsubdivide
+
+    template <uint N>
+    void QuadTreeNode<N>::remove(p2d::Object* objPtr) {
+        auto objPtrIter = container.find(objPtr);
+        if (objPtrIter != container.end()) {
+            container.erase(objPtrIter);
+            decrementObjectCount();
+            parentPtr->unsubdivide();
+        } // if
+    } // update
+
+    template <uint N>
+    void QuadTreeNode<N>::decrementObjectCount() {
+        numObjectsContained--;
+        if (parentPtr != nullptr) {
+            parentPtr->decrementObjectCount();
+        } // if
+    } // decrementObjectCount
+
+    template <uint N>
     bool QuadTreeNode<N>::isLeafNode() const {
         return isLeafNode_;
     } // subdivide
@@ -129,7 +168,7 @@ namespace p2d { namespace utility {
         if (isLeafNode()) {
             if (container.size() < capacity) {
                 std::cout << "Inserting object at " << objPtr << " into leaf node " << this << std::endl;
-                container.push_back(objPtr);
+                container.insert(objPtr);
             } else {
                 std::cout << "Container capacity reached. Time for S U B D I V I S I O N" << std::endl;
                 subdivide();
@@ -139,7 +178,7 @@ namespace p2d { namespace utility {
         } else {
             findNodeContaining(objPtr->getPosition())->insert(objPtr);
         } // if else
-
+        objPtr->setQuad(this);
         numObjectsContained++;
     } // insert
 
@@ -147,6 +186,11 @@ namespace p2d { namespace utility {
     void QuadTreeNode<N>::insert(p2d::Object& obj) {
         insert(&obj);
     } // insert
+
+    template <uint N>
+    void QuadTreeNode<N>::insert(std::shared_ptr<Object> objPtr) {
+        insert(objPtr.get());
+    }
 
     template <uint N>
     void QuadTreeNode<N>::setParent(QuadTreeNode* newParentPtr) {
@@ -246,15 +290,22 @@ namespace p2d { namespace utility {
     }
 
     template <uint N>
-    std::vector<p2d::Object*> QuadTreeNode<N>::containedObjects() {
+    std::set<p2d::Object*> QuadTreeNode<N>::containedObjects() {
         if (isLeafNode()) {
             return container;
         } else {
-            std::vector<p2d::Object*> result;
-            for (uint i = 0; i < 4; i++) {
-                std::vector<p2d::Object*> collected = subnodes[i].containedObjects();
-                result.insert(result.end(), collected.begin(), collected.end());
-            } // for
+            std::set<p2d::Object*> result;
+            std::set<p2d::Object*> collected;
+
+            collected = quadNW->containedObjects();
+            result.insert(collected.begin(), collected.end());
+            collected = quadNE->containedObjects();
+            result.insert(collected.begin(), collected.end());
+            collected = quadSW->containedObjects();
+            result.insert(collected.begin(), collected.end());
+            collected = quadSE->containedObjects();
+            result.insert(collected.begin(), collected.end());
+
             return result;
         } // if else
     } // containedObjects
@@ -294,8 +345,8 @@ namespace p2d { namespace utility {
     template <uint N>
     void QuadTreeNode<N>::distributeObjectsToSubnodes() {
         std::cout << container.size() << std::endl;
-        for (p2d::Object* objPtr : container) {
-            findNodeContaining(objPtr->getPosition())->insert(objPtr);
+        for (auto objIter : container) {
+            findNodeContaining(objIter->getPosition())->insert(objIter);
         } // for
         container.clear();
         std::cout << container.size() << std::endl;

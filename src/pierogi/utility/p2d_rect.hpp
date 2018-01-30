@@ -23,6 +23,7 @@ namespace p2d { namespace utility {
         void operator *= (const float& factor);
 
         inline Vector2<T> getSize() const { return size; }
+        inline Vector2<T> getCenter() const { return origin + size * 0.5f; }
 
         Rect<T> Rect<T>::operator + (const Vector2<T>& rhs);
         Rect<T> Rect<T>::operator * (const float& factor);

@@ -8,6 +8,8 @@
 #include "p2d_vector.hpp"
 #include "../p2d_object.hpp"
 
+#include <memory>
+
 namespace p2d { namespace utility {
     typedef unsigned int uint;
 
@@ -18,7 +20,8 @@ namespace p2d { namespace utility {
     public:
         QuadTree(const Rect<float>& rectCoverage);
 
-        void insert(p2d::Object& obj);        
+        void insert(std::shared_ptr<p2d::Object> objPtr);  
+        void update();      
 
         inline QuadTreeNode<N>* getRoot() { return rootNode; }
         inline Rect<float> getCoverage() const { return rootNode->getCoverage(); }
@@ -34,9 +37,9 @@ namespace p2d { namespace utility {
     } // constructor
 
     template<uint N>
-    void QuadTree<N>::insert(p2d::Object& obj) {
-        std::cout << "Insert object at " << &obj << " into quadtree." << std::endl;
-        rootNode->insert(obj);
+    void QuadTree<N>::insert(std::shared_ptr<p2d::Object> objPtr) {
+        std::cout << "Insert object at " << objPtr.get() << " into quadtree." << std::endl;
+        rootNode->insert(objPtr);
     } // insert
 
     template <uint N>
