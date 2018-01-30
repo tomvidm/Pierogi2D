@@ -41,13 +41,10 @@ namespace p2d {
                 switch (event.mouseEvent.button) {
                 case p2d::input::MouseButton::LEFT:
                     mousePos = event.mouseEvent.position.getFloatified();
-                    rootNodePtr->subdivByPosition(mousePos);
+                    objectPtrs.push_back(std::make_shared<Object>());
+                    objectPtrs.back()->setPosition(mousePos);
+                    rootNodePtr->insert(objectPtrs.back());
                     std::cout << "LEFT";
-                    break;
-                case p2d::input::MouseButton::RIGHT:
-                    mousePos = event.mouseEvent.position.getFloatified();
-                    rootNodePtr->desubdivByPosition(mousePos);
-                    std::cout << "RIGHT";
                     break;
                 default:
                     break;
@@ -57,8 +54,8 @@ namespace p2d {
     } // handleInput
 
     void Instance::update(float dt) {
-        for (auto objPtr : objects) {
-            objPtr->move(math::Vector2f(10.f, 0.f) * dt);
+        for (auto objPtr : objectPtrs) {
+            ;//objPtr->move(math::Vector2f(10.f, 0.f) * dt);
         } // for
     } // move
 
@@ -67,10 +64,10 @@ namespace p2d {
         SDL_RenderClear(renderWindow.getRenderer());
         SDL_SetRenderDrawColor(renderWindow.getRenderer(), 255, 255, 255, 255);
         rootNodePtr->draw(renderWindow.getRenderer());
-        for (auto obj : objects) {
+        for (auto objPtr : objectPtrs) {
             SDL_RenderDrawPoint(renderWindow.getRenderer(),
-                obj->getPosition().getIntified().getX(),
-                obj->getPosition().getIntified().getY());
+                objPtr->getPosition().getIntified().getX(),
+                objPtr->getPosition().getIntified().getY());
         }
         SDL_SetRenderDrawColor(renderWindow.getRenderer(), 255, 0, 0, 255);
         if (rootNodePtr->findSmallestQuadContaining(mousePos.getFloatified()) != nullptr) {

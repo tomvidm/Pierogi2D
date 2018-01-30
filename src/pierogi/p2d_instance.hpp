@@ -36,12 +36,11 @@ namespace p2d {
         p2d::debug::Logger* logger;
 
         std::shared_ptr<QuadTreeNode<Object>> rootNodePtr;
-        std::shared_ptr<QuadTreeNode<Object>> rootNodePtr2;
         p2d::input::Event event;
         p2d::Clock clk;
         math::Vector2f mousePos;
 
-        std::vector<std::shared_ptr<Object>> objects; // Use smart pointers to avoid stupid reallocation bug.
+        std::vector<std::shared_ptr<Object>> objectPtrs; // Use smart pointers to avoid stupid reallocation bug.
 
         uint framePeriod_ = 100;
         bool isRunning_ = true;

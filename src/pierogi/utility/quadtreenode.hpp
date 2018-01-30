@@ -21,7 +21,8 @@ namespace p2d { namespace utility {
         QuadTreeNode(const p2d::utility::Rect<float>& quadCoverage, uint newDepth, QuadTreeNode<T>* parentQuadNode);
         QuadTreeNode(const p2d::utility::Rect<float>& quadCoverage);
 
-        void insertObject(const std::shared_ptr<T>& objPtr, const p2d::math::Vector2f& position);
+        void insert(const std::shared_ptr<T>& objPtr);
+        void insertObject(const std::shared_ptr<T>& objPtr);
 
         std::shared_ptr<QuadTreeNode<T>> findNextQuadContaining(const p2d::math::Vector2f& position);
         std::shared_ptr<QuadTreeNode<T>> findSmallestQuadContaining(const p2d::math::Vector2f& position);
@@ -45,6 +46,9 @@ namespace p2d { namespace utility {
         bool isLeafNode_;
         uint depth;
 
+    private:
+        void distributeContentToSubnodes();
+
     public:
         void subdiv();
         void desubdiv();
@@ -64,15 +68,36 @@ namespace p2d { namespace utility {
     : QuadTreeNode<T>(quadCoverage, 0, nullptr) {;} // Delegating constructor
 
     template <typename T>
-    void QuadTreeNode<T>::insertObject(const std::shared_ptr<T>& objPtr, const p2d::math::Vector2f& position) {
-        std::shared_ptr<QuadTreeNode<T>> quadPtr = findNextQuadContaining(position);
-        if (quadPtr == nullptr) {
-            return;
+    void QuadTreeNode<T>::insert(const std::shared_ptr<T>& objPtr) {
+        findSmallestQuadContaining(objPtr->getPosition())->insertObject(objPtr);
+    }
+
+/*
+    This function blindly pushes the object to the quad, and selection
+    should be delegated to a public interface.
+*/
+
+    template <typename T>
+    void QuadTreeNode<T>::insertObject(const std::shared_ptr<T>& objPtr) {
+        if (container.size() < containerSoftCapacity) {
+            container.push_back(objPtr);
         } else {
-            ;
-        }
+            subdiv();
+            distributeContentToSubnodes();
+            insert(objPtr);
+        } // if else
+
         containerNumObjects++;
     } // insert
+
+    template <typename T>
+    void QuadTreeNode<T>::distributeContentToSubnodes() {
+        for (auto objPtr : container) {
+            insert(objPtr);
+        }
+
+        container.clear();
+    }
 
     template <typename T>
     std::shared_ptr<QuadTreeNode<T>> QuadTreeNode<T>::findNextQuadContaining(const p2d::math::Vector2f& position) {
