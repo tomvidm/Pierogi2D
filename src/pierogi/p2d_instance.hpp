@@ -34,7 +34,6 @@ namespace p2d {
         p2d::input::Event event;
         p2d::Clock clk;
 
-        p2d::utility::QuadTree<QUADTREE_NODE_OBJECT_CAPACITY>* qtreePtr;
         std::vector<std::shared_ptr<Object>> objects; // Use smart pointers to avoid stupid reallocation bug.
 
         uint framePeriod_ = 100;

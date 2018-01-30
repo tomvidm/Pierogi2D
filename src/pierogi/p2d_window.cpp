@@ -26,8 +26,8 @@ namespace p2d {
         std::cout << "SDL_CreateWindow" << std::endl;
         sdlWindowPtr = SDL_CreateWindow(
             "Default Window",
-            900, 100,
-            640, 480,
+            500, 100,
+            800, 600,
             SDL_WINDOW_SHOWN //| SDL_WINDOW_OPENGL
         ); // SDL_CreateWindow
 

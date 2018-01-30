@@ -104,10 +104,12 @@ namespace p2d { namespace utility {
 
     template <uint N>
     QuadTreeNode<N>::~QuadTreeNode() {
-        delete quadNW;
-        delete quadSW;
-        delete quadNE;
-        delete quadSE;
+        if (!isLeafNode()) {
+            delete quadNW;
+            delete quadSW;
+            delete quadNE;
+            delete quadSE;
+        } // if
         // Memory access error when deleting
     }
 
@@ -129,7 +131,7 @@ namespace p2d { namespace utility {
 
     template <uint N>
     void QuadTreeNode<N>::unsubdivide() {
-        if (numObjectsContained <= capacity && quadNW != nullptr) {
+        if (numObjectsContained <= capacity && !isLeafNode()) {
             container = containedObjects();
             delete quadNW;
             delete quadNE;
