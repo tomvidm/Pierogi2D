@@ -18,10 +18,11 @@ namespace p2d { namespace utility {
     template <typename T>
     class QuadTreeNode : public std::enable_shared_from_this<QuadTreeNode<T>> {
     public:
-        QuadTreeNode(const p2d::utility::Rect<float>& quadCoverage, uint newDepth, QuadTreeNode<T>* parentQuadNode);
+        QuadTreeNode(const p2d::utility::Rect<float>& quadCoverage, uint newDepth, uint capacity, QuadTreeNode<T>* parentQuadNode);
         QuadTreeNode(const p2d::utility::Rect<float>& quadCoverage);
 
         void setQuadRectCoverage(const p2d::utility::Rect<float>& quadCoverage);
+        void setContainerCapacity(const uint cap);
 
         void insert(const std::shared_ptr<T>& objPtr);
         void insertObject(const std::shared_ptr<T>& objPtr);
@@ -38,14 +39,18 @@ namespace p2d { namespace utility {
         inline bool isLeafNode() const { return isLeafNode_; }
         inline bool containsPoint(const p2d::math::Vector2f& position) const { return coverage.contains(position); }
 
+        uint getNumContainedObjects() const;
+
         void draw(SDL_Renderer* renderer) const;
+    protected:
+        uint containerSoftCapacity;
+
     private:
         Rect<float> coverage;
 
         std::shared_ptr<QuadTreeNode<T>> subnodes[NUM_SUBQUADS];
                         QuadTreeNode<T>* parentPtr;
         std::vector<std::shared_ptr<T>>     container;
-        uint containerSoftCapacity;
         uint containerNumObjects;
 
         bool isLeafNode_;
@@ -53,23 +58,23 @@ namespace p2d { namespace utility {
 
     private:
         void distributeContentToSubnodes();
-        void sendObjectCountToRoot();
+        void sendObjectCountToRoot(int c);
         void subdiv();
         void desubdiv();
     }; // QuadTreeNode
 
     template <typename T>
-    QuadTreeNode<T>::QuadTreeNode(const p2d::utility::Rect<float>& quadCoverage, uint newDepth, QuadTreeNode<T>* parentQuadNode) 
+    QuadTreeNode<T>::QuadTreeNode(const p2d::utility::Rect<float>& quadCoverage, uint newDepth, uint capacity, QuadTreeNode<T>* parentQuadNode) 
     : coverage(quadCoverage),
       parentPtr(parentQuadNode),
-      containerSoftCapacity(4),
+      containerSoftCapacity(capacity),
       containerNumObjects(0),
       isLeafNode_(true),
       depth(newDepth) {;} // Dele
 
     template <typename T>
     QuadTreeNode<T>::QuadTreeNode(const p2d::utility::Rect<float>& quadCoverage) 
-    : QuadTreeNode<T>(quadCoverage, 0, nullptr) {;} // Delegating constructor
+    : QuadTreeNode<T>(quadCoverage, 0, 1, nullptr) {;} // Delegating constructor
 
     template <typename T>
     void QuadTreeNode<T>::insert(const std::shared_ptr<T>& objPtr) {
@@ -79,6 +84,11 @@ namespace p2d { namespace utility {
     template <typename T>
     void QuadTreeNode<T>::setQuadRectCoverage(const p2d::utility::Rect<float>& quadCoverage) {
         coverage = quadCoverage;
+    }
+
+    template <typename T>
+    void QuadTreeNode<T>::setContainerCapacity(const uint cap) {
+        containerSoftCapacity = cap;
     }
 
 /*
@@ -96,7 +106,7 @@ namespace p2d { namespace utility {
             insert(objPtr);
         } // if else
 
-        containerNumObjects++;
+        sendObjectCountToRoot(1);
     } // insert
 
     template <typename T>
@@ -104,7 +114,6 @@ namespace p2d { namespace utility {
         std::shared_ptr<QuadTreeNode<T>> quadPtr = findSmallestQuadContaining(objPtr);
         if (quadPtr != nullptr) {
             quadPtr->removeObject(objPtr);
-            quadPtr->sendObjectCountToRoot();
         }
     } // removeObject
 
@@ -117,6 +126,7 @@ namespace p2d { namespace utility {
             } // if
         } // for
         container = newContainer;
+        quadPtr->sendObjectCountToRoot(-1);
         
     } // removeObject
 
@@ -139,10 +149,10 @@ namespace p2d { namespace utility {
     }
 
     template <typename T>
-    void QuadTreeNode<T>::sendObjectCountToRoot() {
-        containerNumObjects--;
+    void QuadTreeNode<T>::sendObjectCountToRoot(int c) {
+        containerNumObjects += c;
         if (parentPtr != nullptr) {
-            parentPtr->sendObjectCountToRoot();
+            parentPtr->sendObjectCountToRoot(c);
         }
     }
 
@@ -197,10 +207,10 @@ namespace p2d { namespace utility {
     void QuadTreeNode<T>::subdiv() {
         if (isLeafNode()) {
             isLeafNode_ = false;
-            subnodes[0] = std::make_shared<QuadTreeNode>(coverage * 0.5f, depth + 1, this);
-            subnodes[1] = std::make_shared<QuadTreeNode>(coverage * 0.5f + coverage.getSize().getVectorX() * 0.5f, depth + 1, this);
-            subnodes[2] = std::make_shared<QuadTreeNode>(coverage * 0.5f + coverage.getSize().getVectorY() * 0.5f, depth + 1, this);
-            subnodes[3] = std::make_shared<QuadTreeNode>(coverage * 0.5f + coverage.getSize() * 0.5f, depth + 1, this);
+            subnodes[0] = std::make_shared<QuadTreeNode>(coverage * 0.5f, depth + 1, containerNumObjects, this);
+            subnodes[1] = std::make_shared<QuadTreeNode>(coverage * 0.5f + coverage.getSize().getVectorX() * 0.5f, depth + 1, containerNumObjects, this);
+            subnodes[2] = std::make_shared<QuadTreeNode>(coverage * 0.5f + coverage.getSize().getVectorY() * 0.5f, depth + 1, containerNumObjects, this);
+            subnodes[3] = std::make_shared<QuadTreeNode>(coverage * 0.5f + coverage.getSize() * 0.5f, depth + 1, containerNumObjects, this);
         } else {
             // Throw exception
             return;
@@ -219,6 +229,24 @@ namespace p2d { namespace utility {
             } // for
         } // if else
     }
+
+    /*
+        Simple and recursive, but should be replaced by a bookkeeping scheme
+        to avoid having to recurse through the whole tree just to get a simple number.
+    */
+    template <typename T>
+    uint QuadTreeNode<T>::getNumContainedObjects() const {
+        if (isLeafNode()) {
+            return container.size();
+        } else {
+            uint result = 0;
+            for (uint q = 0; q < NUM_SUBQUADS; q++) {
+                result += subnodes[q]->getNumContainedObjects();
+            }
+            return result;
+        } 
+    }
+
 
     template <typename T>
     void QuadTreeNode<T>::draw(SDL_Renderer* renderer) const {

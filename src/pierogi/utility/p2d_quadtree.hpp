@@ -9,6 +9,7 @@
 #include "../p2d_object.hpp"
 
 #include <memory>
+#include <iostream>
 
 namespace p2d { namespace utility {
     typedef unsigned int uint;
@@ -20,9 +21,12 @@ namespace p2d { namespace utility {
     public:
         QuadTree();
         QuadTree(const p2d::utility::Rect<float>& quadCoverage);
-        void setQuadCoverage(const p2d::utility::Rect<float>& quadCoverage);
+        void setCoverage(const p2d::utility::Rect<float>& quadCoverage);
+        void setCapacity(const uint cap);
         void insert(const std::shared_ptr<p2d::Object>& objPtr);
         void draw(SDL_Renderer* renderer) const;
+
+        inline uint getNumContainedObjects() const { return rootNodePtr->getNumContainedObjects(); }
 
         std::shared_ptr<QuadTreeNode<T>> getQuadByPosition(const p2d::math::Vector2f& pos) const;
     private:
@@ -40,12 +44,18 @@ namespace p2d { namespace utility {
     }
 
     template <typename T>
-    void QuadTree<T>::setQuadCoverage(const p2d::utility::Rect<float>& quadCoverage) {
-        rootNodePtr
+    void QuadTree<T>::setCoverage(const p2d::utility::Rect<float>& quadCoverage) {
+        rootNodePtr->setQuadRectCoverage(quadCoverage);
+    }
+
+    template <typename T>
+    void QuadTree<T>::setCapacity(const uint cap) {
+        rootNodePtr->setContainerCapacity(cap);
     }
 
     template <typename T>
     void QuadTree<T>::insert(const std::shared_ptr<p2d::Object>& objPtr) {
+        std::cout << "Inserting object at posiion " << objPtr->getPosition().getX() << ", " << objPtr->getPosition().getY() << std::endl;
         rootNodePtr->insert(objPtr);
     }
 

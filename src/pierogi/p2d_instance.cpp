@@ -42,17 +42,11 @@ namespace p2d {
                 break;
             }
             if (event.eventType == p2d::input::EventType::MOUSE_BUTTON_PRESS) {
-                mousePos = event.mouseEvent.position.getFloatified();
                 switch (event.mouseEvent.button) {
-                case p2d::input::MouseButton::LEFT:
-                    objectPtrs.push_back(std::make_shared<Object>());
-                    objectPtrs.back()->setPosition(mousePos);
-                    quadTreePtr->insert(objectPtrs.back());
-                    break;
-                case p2d::input::MouseButton::RIGHT:
-                    ;
-                default:
-                    break;
+                    case p2d::input::MouseButton::LEFT:
+                    case p2d::input::MouseButton::RIGHT:
+                    default:
+                        break;
                 } // switch
             } // if
         } // while
