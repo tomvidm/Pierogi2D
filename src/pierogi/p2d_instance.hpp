@@ -10,7 +10,7 @@
 #include "p2d_utility.hpp"
 #include "p2d_object.hpp"
 #include "p2d_window.hpp"
-#include "quadtreenode.hpp"
+#include "p2d_quadtree.hpp"
 
 #include <memory>
 
@@ -35,7 +35,7 @@ namespace p2d {
         p2d::input::EventHandler eventHandler;
         p2d::debug::Logger* logger;
 
-        std::shared_ptr<QuadTreeNode<Object>> rootNodePtr;
+        std::shared_ptr<p2d::utility::QuadTree<Object>> quadTreePtr;
         p2d::input::Event event;
         p2d::Clock clk;
         math::Vector2f mousePos;

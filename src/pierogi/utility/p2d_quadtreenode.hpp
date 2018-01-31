@@ -1,371 +1,237 @@
-#ifndef P2D_QUADTREENODE_HPP
-#define P2D_QUADTREENODE_HPP
-
-#include <vector>
-#include <memory>
-#include <string>
-#include <set>
+#ifndef QUADTREENODE_HPP
+#define QUADTREENODE_HPP
 
 #include "SDL.h"
+
+#include <memory>
+#include <vector>
+#include <string>
+
 #include "p2d_rect.hpp"
+#include "p2d_math.hpp"
 
-#include "p2d_stringutils.hpp"
-
-#include "../p2d_object.hpp"
-#include "../debug/p2d_logger.hpp"
+#define NUM_SUBQUADS 4
 
 namespace p2d { namespace utility {
-    typedef unsigned int IntMask;
     typedef unsigned int uint;
 
-    enum SubQuad { 
-        ROOT = -1,
-        NW = 0, 
-        NE = 1, 
-        SE = 2, 
-        SW = 3
-    };
-
-    /*
-    QuadTreeNode
-    Holds N objects of type T and some info about its place in the quadtree.
-
-    REQUIRES:
-    The container holds pointers to objects of type T. For the algorithms to work,
-    T must have an interface which 
-    */
-    template <uint N>
-    class QuadTreeNode {
+    template <typename T>
+    class QuadTreeNode : public std::enable_shared_from_this<QuadTreeNode<T>> {
     public:
-        QuadTreeNode(const SubQuad& quadHeading, const Rect<float>& rectCoverage);
-        ~QuadTreeNode();
+        QuadTreeNode(const p2d::utility::Rect<float>& quadCoverage, uint newDepth, QuadTreeNode<T>* parentQuadNode);
+        QuadTreeNode(const p2d::utility::Rect<float>& quadCoverage);
 
-        void remove(p2d::Object* objPtr);
+        void setQuadRectCoverage(const p2d::utility::Rect<float>& quadCoverage);
 
-        bool isLeafNode() const;
+        void insert(const std::shared_ptr<T>& objPtr);
+        void insertObject(const std::shared_ptr<T>& objPtr);
+        void remove(const std::shared_ptr<T>& objPtr);
+        void removeObject(const std::shared_ptr<T>& objPtr);
+        void moveObject(const std::shared_ptr<T>& objPtr, const p2d::math::Vector2f& dest);
 
-        void insert(p2d::Object* obj);
-        void insert(p2d::Object& obj);
-        void insert(std::shared_ptr<Object> objPtr);
+        std::shared_ptr<QuadTreeNode<T>> findNextQuadContaining(const p2d::math::Vector2f& position);
+        std::shared_ptr<QuadTreeNode<T>> findSmallestQuadContaining(const p2d::math::Vector2f& position);
 
-        inline Rect<float> getCoverage() const { return coverage; }
-        void setRectCoverage(const Rect<float>& rect);
-        bool coversPoint(const p2d::math::Vector2f& point) const;
+        void subdivByPosition(const p2d::math::Vector2f& position);
+        void desubdivByPosition(const p2d::math::Vector2f& position);
 
-        QuadTreeNode* findNodeContaining(const p2d::math::Vector2f& point);
-        QuadTreeNode* getNorth();
-        QuadTreeNode* getEast();
-        QuadTreeNode* getSouth();
-        QuadTreeNode* getWest();
-        std::set<p2d::Object*> containedObjects();
-
-        QuadTreeNode* get(const SubQuad& which);
+        inline bool isLeafNode() const { return isLeafNode_; }
+        inline bool containsPoint(const p2d::math::Vector2f& position) const { return coverage.contains(position); }
 
         void draw(SDL_Renderer* renderer) const;
-
-    protected:
-        void setParent(QuadTreeNode* newParentPtr);
-        void setHeading(const SubQuad& heading);
-
-        void decrementObjectCount();
-        
-        void subdivide();
-        void unsubdivide();
     private:
-        bool isLeafNode_ = true;
-        uint treeDepth = 0;
-        uint numObjectsContained = 0;
-        const unsigned int capacity;
-        std::set<p2d::Object*> container;
         Rect<float> coverage;
 
-        QuadTreeNode* parentPtr = nullptr;
-        QuadTreeNode* quadNW;
-        QuadTreeNode* quadSW;
-        QuadTreeNode* quadNE;
-        QuadTreeNode* quadSE;
-        SubQuad heading;
+        std::shared_ptr<QuadTreeNode<T>> subnodes[NUM_SUBQUADS];
+                        QuadTreeNode<T>* parentPtr;
+        std::vector<std::shared_ptr<T>>     container;
+        uint containerSoftCapacity;
+        uint containerNumObjects;
 
-        void distributeRectCoverageToSubnodes();
-        void setParentOfSubnodes();
-        void setSubnodeHeading();
-        void setDepth(uint depth = 0);
-        void distributeObjectsToSubnodes();
+        bool isLeafNode_;
+        uint depth;
 
-        p2d::debug::Logger* logger;
-    }; // QuadTreeTree
+    private:
+        void distributeContentToSubnodes();
+        void sendObjectCountToRoot();
+        void subdiv();
+        void desubdiv();
+    }; // QuadTreeNode
 
-    template <uint N>
-    QuadTreeNode<N>::QuadTreeNode(const SubQuad& quadHeading, const Rect<float>& rectCoverage)
-    : capacity(N), heading(quadHeading), coverage(rectCoverage) {
-        logger = p2d::debug::Logger::getInstancePtr();
-        //logger->log("QuadTreeNode constructed...", p2d::debug::LogLevel::DEBUG);
-    } // constructor
+    template <typename T>
+    QuadTreeNode<T>::QuadTreeNode(const p2d::utility::Rect<float>& quadCoverage, uint newDepth, QuadTreeNode<T>* parentQuadNode) 
+    : coverage(quadCoverage),
+      parentPtr(parentQuadNode),
+      containerSoftCapacity(4),
+      containerNumObjects(0),
+      isLeafNode_(true),
+      depth(newDepth) {;} // Dele
 
-    template <uint N>
-    QuadTreeNode<N>::~QuadTreeNode() {
-        if (!isLeafNode()) {
-            delete quadNW;
-            delete quadSW;
-            delete quadNE;
-            delete quadSE;
-        } // if
-        // Memory access error when deleting
+    template <typename T>
+    QuadTreeNode<T>::QuadTreeNode(const p2d::utility::Rect<float>& quadCoverage) 
+    : QuadTreeNode<T>(quadCoverage, 0, nullptr) {;} // Delegating constructor
+
+    template <typename T>
+    void QuadTreeNode<T>::insert(const std::shared_ptr<T>& objPtr) {
+        findSmallestQuadContaining(objPtr->getPosition())->insertObject(objPtr);
     }
 
-    template <uint N>
-    void QuadTreeNode<N>::subdivide() {
-        std::cout << "\t Subdividing lead node into quadtreenodes at ";
-        if (isLeafNode()) {
-            Rect<float> newCoverage = coverage * 0.5f;
-            quadNW = new QuadTreeNode<N>(SubQuad::NW, newCoverage);
-            quadSW = new QuadTreeNode<N>(SubQuad::SW, newCoverage + newCoverage.getSize().getVectorY());
-            quadNE = new QuadTreeNode<N>(SubQuad::NE, newCoverage + newCoverage.getSize().getVectorX());
-            quadSE = new QuadTreeNode<N>(SubQuad::SE, newCoverage + newCoverage.getSize());
-            std::cout << quadNW << ", " << quadSW << ", " << quadNE << ", " << quadSE << std::endl;
-            isLeafNode_ = false;
-            setParentOfSubnodes();
-            setDepth();
-        } // if
-    } // subdivide
+    template <typename T>
+    void QuadTreeNode<T>::setQuadRectCoverage(const p2d::utility::Rect<float>& quadCoverage) {
+        coverage = quadCoverage;
+    }
 
-    template <uint N>
-    void QuadTreeNode<N>::unsubdivide() {
-        if (numObjectsContained <= capacity && !isLeafNode()) {
-            container = containedObjects();
-            delete quadNW;
-            delete quadNE;
-            delete quadSW;
-            delete quadSE;
-            isLeafNode_ = true;
-            parentPtr->unsubdivide();
-        } // if
-    } // unsubdivide
+/*
+    This function blindly pushes the object to the quad, and selection
+    should be delegated to a public interface.
+*/
 
-    template <uint N>
-    void QuadTreeNode<N>::remove(p2d::Object* objPtr) {
-        auto objPtrIter = container.find(objPtr);
-        if (objPtrIter != container.end()) {
-            container.erase(objPtrIter);
-            decrementObjectCount();
-            parentPtr->unsubdivide();
-        } // if
-    } // update
-
-    template <uint N>
-    void QuadTreeNode<N>::decrementObjectCount() {
-        numObjectsContained--;
-        if (parentPtr != nullptr) {
-            parentPtr->decrementObjectCount();
-        } // if
-    } // decrementObjectCount
-
-    template <uint N>
-    bool QuadTreeNode<N>::isLeafNode() const {
-        return isLeafNode_;
-    } // subdivide
-
-    template <uint N>
-    void QuadTreeNode<N>::insert(p2d::Object* objPtr) {
-        if (isLeafNode()) {
-            if (container.size() < capacity) {
-                std::cout << "Inserting object at " << objPtr << " into leaf node " << this << std::endl;
-                container.insert(objPtr);
-            } else {
-                std::cout << "Container capacity reached. Time for S U B D I V I S I O N" << std::endl;
-                subdivide();
-                findNodeContaining(objPtr->getPosition())->insert(objPtr);
-                distributeObjectsToSubnodes();
-            } // if else
+    template <typename T>
+    void QuadTreeNode<T>::insertObject(const std::shared_ptr<T>& objPtr) {
+        if (container.size() < containerSoftCapacity) {
+            container.push_back(objPtr);
         } else {
-            findNodeContaining(objPtr->getPosition())->insert(objPtr);
+            subdiv();
+            distributeContentToSubnodes();
+            insert(objPtr);
         } // if else
-        objPtr->setQuad(this);
-        numObjectsContained++;
+
+        containerNumObjects++;
     } // insert
 
-    template <uint N>
-    void QuadTreeNode<N>::insert(p2d::Object& obj) {
-        insert(&obj);
-    } // insert
-
-    template <uint N>
-    void QuadTreeNode<N>::insert(std::shared_ptr<Object> objPtr) {
-        insert(objPtr.get());
-    }
-
-    template <uint N>
-    void QuadTreeNode<N>::setParent(QuadTreeNode* newParentPtr) {
-        parentPtr = newParentPtr;
-    } // subdivide
-
-    template <uint N>
-    void QuadTreeNode<N>::setHeading(const SubQuad& subnodeHeading) {
-        heading = subnodeHeading;
-    } // subdivide
-
-    template <uint N>
-    void QuadTreeNode<N>::setRectCoverage(const Rect<float>& rect) {
-        coverage = rect;
-    } // setRectCoverage
-
-    template <uint N>
-    bool QuadTreeNode<N>::coversPoint(const p2d::math::Vector2f& point) const {
-        return coverage.contains(point);
-    } // coversPoint
-
-    template <uint N>
-    QuadTreeNode<N>* QuadTreeNode<N>::findNodeContaining(const p2d::math::Vector2f& point) {
-        if (quadNW->coversPoint(point)) {
-            if (quadNW->isLeafNode()) {
-                return quadNW;
-            } else {
-                return quadNW->findNodeContaining(point);
-            } // if else
-        } // if
-        if (quadSW->coversPoint(point)) {
-            if (quadSW->isLeafNode()) {
-                return quadSW;
-            } else {
-                return quadSW->findNodeContaining(point);
-            } // if else
-        } // if
-        if (quadNE->coversPoint(point)) {
-            if (quadNE->isLeafNode()) {
-                return quadNE;
-            } else {
-                return quadNE->findNodeContaining(point);
-            } // if else
-        } // if
-        if (quadSE->coversPoint(point)) {
-            if (quadSE->isLeafNode()) {
-                return quadSE;
-            } else {
-                return quadSE->findNodeContaining(point);
-            } // if else
-        } // if
-        return this;
-    } // findNodeContaining
-
-    template <uint N>
-    QuadTreeNode<N>* QuadTreeNode<N>::getNorth() {
-        if (heading == SubQuad::SW) {
-            return parentPtr->get(SubQuad::NW);
-        } else if (heading == SubQuad::SE) {
-            return parentPtr->get(SubQuad::NE);
-        } else if (heading == SubQuad::NW || heading == SubQuad::NE) {
-            return this; // Need to develop a good way to do this
+    template <typename T>
+    void QuadTreeNode<T>::remove(const std::shared_ptr<T>& objPtr) {
+        std::shared_ptr<QuadTreeNode<T>> quadPtr = findSmallestQuadContaining(objPtr);
+        if (quadPtr != nullptr) {
+            quadPtr->removeObject(objPtr);
+            quadPtr->sendObjectCountToRoot();
         }
-    }
+    } // removeObject
 
-    template <uint N>
-    QuadTreeNode<N>* QuadTreeNode<N>::getEast() {
-        if (heading == SubQuad::NW) {
-            return parentPtr->get(SubQuad::NE);
-        } else if (heading == SubQuad::SW) {
-            return parentPtr->get(SubQuad::SE);
-        } else if (heading == SubQuad::NE || heading == SubQuad::SE) {
-            return this; // Need to develop a good way to do this
-        }
-    }
-
-    template <uint N>
-    QuadTreeNode<N>* QuadTreeNode<N>::getSouth() {
-        if (heading == SubQuad::NW) {
-            return parentPtr->get(SubQuad::SW);
-        } else if (heading == SubQuad::NE) {
-            return parentPtr->get(SubQuad::SE);
-        } else if (heading == SubQuad::SW || heading == SubQuad::SE) {
-            return this; // Need to develop a good way to do this
-        }
-    }
-
-    template <uint N>
-    QuadTreeNode<N>* QuadTreeNode<N>::getWest() {
-        if (heading == SubQuad::NE) {
-            return parentPtr->get(SubQuad::NW);
-        } else if (heading == SubQuad::SE) {
-            return parentPtr->get(SubQuad::SW);
-        } else if (heading == SubQuad::NE || heading == SubQuad::SE) {
-            return this; // Need to develop a good way to do this
-        }
-    }
-
-    template <uint N>
-    std::set<p2d::Object*> QuadTreeNode<N>::containedObjects() {
-        if (isLeafNode()) {
-            return container;
-        } else {
-            std::set<p2d::Object*> result;
-            std::set<p2d::Object*> collected;
-
-            collected = quadNW->containedObjects();
-            result.insert(collected.begin(), collected.end());
-            collected = quadNE->containedObjects();
-            result.insert(collected.begin(), collected.end());
-            collected = quadSW->containedObjects();
-            result.insert(collected.begin(), collected.end());
-            collected = quadSE->containedObjects();
-            result.insert(collected.begin(), collected.end());
-
-            return result;
-        } // if else
-    } // containedObjects
-
-    template <uint N>
-    QuadTreeNode<N>* QuadTreeNode<N>::get(const SubQuad& which) {
-        if (which == SubQuad::NW) {
-            return quadNW;
-        } else if (which == SubQuad::SW) {
-            return quadSW;
-        } else if (which == SubQuad::NE) {
-            return quadNE;
-        } else (which == SubQuad::SE) {
-            return quadSE;
-        }
-    } // get
-
-    template <uint N>
-    void QuadTreeNode<N>::setParentOfSubnodes() {
-        quadNW->setParent(this);
-        quadSW->setParent(this);
-        quadNE->setParent(this);
-        quadSE->setParent(this);
-    } // distributeRectCoverageToSubnodes
-
-    template <uint N>
-    void QuadTreeNode<N>::setDepth(uint depth) {
-        treeDepth = depth;
-        if (!isLeafNode()) {
-            quadNW->setDepth(treeDepth + 1);
-            quadSW->setDepth(treeDepth + 1);
-            quadNE->setDepth(treeDepth + 1);
-            quadSE->setDepth(treeDepth + 1);
-        } // if 
-    } // setDepth
-
-    template <uint N>
-    void QuadTreeNode<N>::distributeObjectsToSubnodes() {
-        std::cout << container.size() << std::endl;
-        for (auto objIter : container) {
-            findNodeContaining(objIter->getPosition())->insert(objIter);
+    template <typename T>
+    void QuadTreeNode<T>::removeObject(const std::shared_ptr<T>& objPtr) {
+        std::vector<std::shared_ptr<T>> newContainer;
+        for (auto containerObjPtr : container){
+            if (objPtr.get() != containerObjPtr.get()) {
+                newContainer.push_back(containerObjPtr);
+            } // if
         } // for
-        container.clear();
-        std::cout << container.size() << std::endl;
-    } // distributePObjectsToSubnodes
+        container = newContainer;
+        
+    } // removeObject
 
-    template <uint N>
-    void QuadTreeNode<N>::draw(SDL_Renderer* renderer) const {
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    template <typename T>
+    void QuadTreeNode<T>::moveObject(const std::shared_ptr<T>& objPtr, const p2d::math::Vector2f& dest) {
+        std::shared_ptr<QuadTreeNode<T>> oldQuadPtr = findSmallestQuadContaining(objPtr->getPosition());
+        std::shared_ptr<QuadTreeNode<T>> newQuadPtr = findSmallestQuadContaining(dest);
+
+        oldQuadPtr->removeObject(objPtr);
+        newQuadPtr->insertObject(objPtr);
+    } // moveObject
+
+    template <typename T>
+    void QuadTreeNode<T>::distributeContentToSubnodes() {
+        for (auto objPtr : container) {
+            insert(objPtr);
+        }
+
+        container.clear();
+    }
+
+    template <typename T>
+    void QuadTreeNode<T>::sendObjectCountToRoot() {
+        containerNumObjects--;
+        if (parentPtr != nullptr) {
+            parentPtr->sendObjectCountToRoot();
+        }
+    }
+
+    template <typename T>
+    std::shared_ptr<QuadTreeNode<T>> QuadTreeNode<T>::findNextQuadContaining(const p2d::math::Vector2f& position) {
+        if (containsPoint(position)) {
+            if (isLeafNode()) {
+                return shared_from_this();
+            }   else {
+                for (uint q = 0; q < NUM_SUBQUADS; q++) {
+                    if (subnodes[q]->containsPoint(position)) {
+                        return subnodes[q];
+                    } // if
+                } // for
+                return nullptr;
+            } // if else
+        }   else {
+            return nullptr;
+        } // if else
+    } // findQuad
+
+    template <typename T>
+    std::shared_ptr<QuadTreeNode<T>> QuadTreeNode<T>::findSmallestQuadContaining(const p2d::math::Vector2f& position) {
+        if (containsPoint(position)) {
+            if (isLeafNode()) {
+                return shared_from_this();
+            }   else {
+                for (uint q = 0; q < NUM_SUBQUADS; q++) {
+                    if (subnodes[q]->containsPoint(position)) {
+                        return subnodes[q]->findSmallestQuadContaining(position);
+                    } // if
+                } // for
+                return nullptr;
+            } // if else
+        }   else {
+            return nullptr;
+        } // if else
+    } // findQuad
+
+    template <typename T>
+    void QuadTreeNode<T>::subdivByPosition(const p2d::math::Vector2f& position){
+        findSmallestQuadContaining(position)->subdiv();   
+    }
+
+    template <typename T>
+    void QuadTreeNode<T>::desubdivByPosition(const p2d::math::Vector2f& position){
+        findSmallestQuadContaining(position)->desubdiv();   
+    }
+
+
+    template <typename T>
+    void QuadTreeNode<T>::subdiv() {
+        if (isLeafNode()) {
+            isLeafNode_ = false;
+            subnodes[0] = std::make_shared<QuadTreeNode>(coverage * 0.5f, depth + 1, this);
+            subnodes[1] = std::make_shared<QuadTreeNode>(coverage * 0.5f + coverage.getSize().getVectorX() * 0.5f, depth + 1, this);
+            subnodes[2] = std::make_shared<QuadTreeNode>(coverage * 0.5f + coverage.getSize().getVectorY() * 0.5f, depth + 1, this);
+            subnodes[3] = std::make_shared<QuadTreeNode>(coverage * 0.5f + coverage.getSize() * 0.5f, depth + 1, this);
+        } else {
+            // Throw exception
+            return;
+        } // if else
+    } // subdiv
+
+    template <typename T>
+    void QuadTreeNode<T>::desubdiv() {
+        if (isLeafNode() && !(parentPtr == nullptr)) {
+            parentPtr->desubdiv();
+        } else {
+            isLeafNode_ = true;
+            for (uint q = 0; q < NUM_SUBQUADS; q++) {
+                // Collect all objects here!
+                subnodes[q].reset();
+            } // for
+        } // if else
+    }
+
+    template <typename T>
+    void QuadTreeNode<T>::draw(SDL_Renderer* renderer) const {
         SDL_RenderDrawRect(renderer, &coverage.getSDLRect());
-        if (!isLeafNode()) {
-            quadNW->draw(renderer);
-            quadSW->draw(renderer);
-            quadNE->draw(renderer);
-            quadSE->draw(renderer);
-        } // if
+        if (isLeafNode()) {
+            return;
+        } else {
+            for (uint q = 0; q < NUM_SUBQUADS; q++) {
+            subnodes[q]->draw(renderer);
+            }// for
+        } // if else
     } // draw
-} // utility
-} // p2d
+} // namespace utility
+} // namespace p2d
 
 #endif

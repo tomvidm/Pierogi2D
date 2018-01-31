@@ -3,7 +3,7 @@
 
 #include "p2d_rect.hpp"
 #include "p2d_circularbuffer.hpp"
-#include "quadtreenode.hpp"
+#include "p2d_quadtreenode.hpp"
 
 namespace p2d { namespace utility {
     typedef Rect<float> FloatRect;

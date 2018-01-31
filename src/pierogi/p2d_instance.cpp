@@ -16,7 +16,7 @@ namespace p2d {
 
     void Instance::run() {
         p2d::utility::Rect<float> rect(64.f, 64.f, 640.f, 480.f);
-        rootNodePtr = std::make_shared<QuadTreeNode<Object>>(rect);
+        quadTreePtr = std::make_shared<p2d::utility::QuadTree<Object>>(rect);
 
         clk.reset();
         while (isRunning()) {
@@ -35,17 +35,22 @@ namespace p2d {
             event = eventHandler.getEvent();
             if (event.eventType == p2d::input::EventType::QUIT) {
                 isRunning_ = false;
+                break;
             } // if
+            if (event.eventType == p2d::input::EventType::MOUSE_MOTION) {
+                mousePos = event.mouseEvent.position.getFloatified();
+                break;
+            }
             if (event.eventType == p2d::input::EventType::MOUSE_BUTTON_PRESS) {
-                std::cout << "PRESS";
+                mousePos = event.mouseEvent.position.getFloatified();
                 switch (event.mouseEvent.button) {
                 case p2d::input::MouseButton::LEFT:
-                    mousePos = event.mouseEvent.position.getFloatified();
                     objectPtrs.push_back(std::make_shared<Object>());
                     objectPtrs.back()->setPosition(mousePos);
-                    rootNodePtr->insert(objectPtrs.back());
-                    std::cout << "LEFT";
+                    quadTreePtr->insert(objectPtrs.back());
                     break;
+                case p2d::input::MouseButton::RIGHT:
+                    ;
                 default:
                     break;
                 } // switch
@@ -62,16 +67,16 @@ namespace p2d {
     void Instance::render() {
         SDL_SetRenderDrawColor(renderWindow.getRenderer(), 0, 0, 0, 255);
         SDL_RenderClear(renderWindow.getRenderer());
-        SDL_SetRenderDrawColor(renderWindow.getRenderer(), 255, 255, 255, 255);
-        rootNodePtr->draw(renderWindow.getRenderer());
+        SDL_SetRenderDrawColor(renderWindow.getRenderer(), 92, 92, 92, 255);
+        quadTreePtr->draw(renderWindow.getRenderer());
         for (auto objPtr : objectPtrs) {
             SDL_RenderDrawPoint(renderWindow.getRenderer(),
                 objPtr->getPosition().getIntified().getX(),
                 objPtr->getPosition().getIntified().getY());
         }
         SDL_SetRenderDrawColor(renderWindow.getRenderer(), 255, 0, 0, 255);
-        if (rootNodePtr->findSmallestQuadContaining(mousePos.getFloatified()) != nullptr) {
-            rootNodePtr->findSmallestQuadContaining(mousePos.getFloatified())->draw(renderWindow.getRenderer());
+        if (quadTreePtr->getQuadByPosition(mousePos.getFloatified()) != nullptr) {
+            quadTreePtr->getQuadByPosition(mousePos.getFloatified())->draw(renderWindow.getRenderer());
         }
         SDL_RenderPresent(renderWindow.getRenderer());
     } // render

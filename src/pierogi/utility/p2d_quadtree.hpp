@@ -15,36 +15,48 @@ namespace p2d { namespace utility {
 
     using p2d::math::Vector2f;
 
-    template <uint N>
+    template <typename T>
     class QuadTree {
     public:
-        QuadTree(const Rect<float>& rectCoverage);
-
-        void insert(std::shared_ptr<p2d::Object> objPtr);  
-        void update();      
-
-        inline QuadTreeNode<N>* getRoot() { return rootNode; }
-        inline Rect<float> getCoverage() const { return rootNode->getCoverage(); }
-
+        QuadTree();
+        QuadTree(const p2d::utility::Rect<float>& quadCoverage);
+        void setQuadCoverage(const p2d::utility::Rect<float>& quadCoverage);
+        void insert(const std::shared_ptr<p2d::Object>& objPtr);
         void draw(SDL_Renderer* renderer) const;
+
+        std::shared_ptr<QuadTreeNode<T>> getQuadByPosition(const p2d::math::Vector2f& pos) const;
     private:
-        QuadTreeNode<N>* rootNode = nullptr;
+        std::shared_ptr<QuadTreeNode<T>> rootNodePtr;
     }; // QuadTree
 
-    template<uint N>
-    QuadTree<N>::QuadTree(const Rect<float>& rectCoverage) {
-        rootNode = new QuadTreeNode<N>(SubQuad::ROOT, rectCoverage);
-    } // constructor
+    template <typename T>
+    QuadTree<T>::QuadTree() {
+        ;
+    }
 
-    template<uint N>
-    void QuadTree<N>::insert(std::shared_ptr<p2d::Object> objPtr) {
-        std::cout << "Insert object at " << objPtr.get() << " into quadtree." << std::endl;
-        rootNode->insert(objPtr);
-    } // insert
+    template <typename T>
+    QuadTree<T>::QuadTree(const p2d::utility::Rect<float>& quadCoverage) {
+        rootNodePtr = std::make_shared<QuadTreeNode<T>>(quadCoverage);
+    }
 
-    template <uint N>
-    void QuadTree<N>::draw(SDL_Renderer* renderer) const {
-        rootNode->draw(renderer);
+    template <typename T>
+    void QuadTree<T>::setQuadCoverage(const p2d::utility::Rect<float>& quadCoverage) {
+        rootNodePtr
+    }
+
+    template <typename T>
+    void QuadTree<T>::insert(const std::shared_ptr<p2d::Object>& objPtr) {
+        rootNodePtr->insert(objPtr);
+    }
+
+    template <typename T>
+    void QuadTree<T>::draw(SDL_Renderer* renderer) const {
+        rootNodePtr->draw(renderer);
+    }
+
+    template <typename T>
+    std::shared_ptr<QuadTreeNode<T>> QuadTree<T>::getQuadByPosition(const p2d::math::Vector2f& pos) const {
+        return rootNodePtr->findSmallestQuadContaining(pos);
     }
 
 } // namespace utility

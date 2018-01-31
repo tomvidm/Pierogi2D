@@ -49,9 +49,13 @@ namespace p2d { namespace input {
     } // onButtonPress
 
     Event MouseEventHandler::onMotion(const SDL_MouseMotionEvent& sdlMouseMotionEvent) {
+        MouseEvent mouseEvent;
         mouseStatePtr->setMousePosition(Vector2i(sdlMouseMotionEvent.x,
                                                  sdlMouseMotionEvent.y));
-        return Event(EventType::NONE);
+        mouseEvent.position = Vector2i(sdlMouseMotionEvent.x,
+                                       sdlMouseMotionEvent.y);
+        return Event(EventType::MOUSE_MOTION,
+                     mouseEvent);
     }
 } // namespace input
 } // namespace p2d
