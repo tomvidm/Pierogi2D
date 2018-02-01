@@ -53,6 +53,7 @@ namespace p2d {
         glOrtho( 0.0, 800, 600, 0.0, 1.0, -1.0 );
         glMatrixMode( GL_MODELVIEW );
         glLoadIdentity();
+        glPushMatrix();
         glClearColor(0.5, 1.0, 0.5, 1.0);
         glClear ( GL_COLOR_BUFFER_BIT );
         flip();
@@ -69,13 +70,15 @@ namespace p2d {
         SDL_GL_SwapWindow(sdlWindowPtr);
     } // flip
 
-    void GLWindow::render() const {
+    void GLWindow::render() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         glMatrixMode(GL_MODELVIEW);
+        glPopMatrix();
         glLoadIdentity();
-
-        glTranslatef(800.0/2.0, 600.0 / 2.0, 0.0);
+        glTranslatef(viewport.getOrigin().getX(), viewport.getOrigin().getY(), 0.0);
+        glPushMatrix();
+        glTranslatef(800.0/2.0, 600.0/2.0, 0.0);
 
         glBegin( GL_QUADS );
             glColor3f( 1.f, 0.f, 0.f ); glVertex2f( -50.f, -50.f );

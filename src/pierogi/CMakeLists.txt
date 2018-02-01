@@ -12,6 +12,7 @@ add_library(p2d-core
     p2d_instance.cpp
     p2d_object.cpp
     p2d_glwindow.cpp
+    p2d_viewport.cpp
     )
 
 set_target_properties(p2d-core

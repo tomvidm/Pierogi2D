@@ -52,6 +52,8 @@ namespace p2d { namespace input {
                                                  sdlMouseMotionEvent.y));
         mouseEvent.position = Vector2i(sdlMouseMotionEvent.x,
                                        sdlMouseMotionEvent.y);
+        mouseEvent.diff = Vector2i(sdlMouseMotionEvent.xrel,
+                                   sdlMouseMotionEvent.yrel);
         return Event(EventType::MOUSE_MOTION,
                      mouseEvent);
     }

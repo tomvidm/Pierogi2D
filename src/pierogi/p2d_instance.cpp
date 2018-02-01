@@ -39,6 +39,8 @@ namespace p2d {
             } // if
             if (event.eventType == p2d::input::EventType::MOUSE_MOTION) {
                 mousePos = event.mouseEvent.position.getFloatified();
+                mousePosChange = event.mouseEvent.diff.getFloatified();
+                glWindow.getViewport().moveRelative(mousePosChange);
                 break;
             }
             if (event.eventType == p2d::input::EventType::MOUSE_BUTTON_PRESS) {

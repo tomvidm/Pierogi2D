@@ -26,7 +26,9 @@ namespace p2d {
         bool initOpenGL();
 
         void flip() const;
-        void render() const;
+        void render();
+
+        inline Viewport& getViewport() { return viewport; }
 
         inline SDL_Window* getWindow() { return sdlWindowPtr; }
     private:

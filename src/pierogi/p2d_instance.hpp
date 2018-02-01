@@ -39,6 +39,7 @@ namespace p2d {
         p2d::input::Event event;
         p2d::Clock clk;
         math::Vector2f mousePos;
+        math::Vector2f mousePosChange;
 
         std::vector<std::shared_ptr<Object>> objectPtrs; // Use smart pointers to avoid stupid reallocation bug.
 

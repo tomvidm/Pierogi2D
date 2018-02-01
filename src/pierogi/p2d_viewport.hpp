@@ -12,6 +12,8 @@ namespace p2d {
 
         void moveTo(const math::Vector2f& pos);
         void moveRelative(const math::Vector2f& dpos);
+
+        inline math::Vector2f getOrigin() const { return viewportRect.getOrigin(); }
     private:
         utility::Rect<float> viewportRect;
     }; // Viewport
