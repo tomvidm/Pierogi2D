@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "SDL.h"
+#include "GL/glew.h"
 #include "p2d_viewport.hpp"
 #include "p2d_typedefs.hpp"
 

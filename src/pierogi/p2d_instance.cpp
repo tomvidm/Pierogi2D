@@ -59,27 +59,14 @@ namespace p2d {
     } // move
 
     void Instance::render() {
-        SDL_SetRenderDrawColor(renderWindow.getRenderer(), 0, 0, 0, 255);
-        SDL_RenderClear(renderWindow.getRenderer());
-        SDL_SetRenderDrawColor(renderWindow.getRenderer(), 92, 92, 92, 255);
-        quadTreePtr->draw(renderWindow.getRenderer());
-        for (auto objPtr : objectPtrs) {
-            SDL_RenderDrawPoint(renderWindow.getRenderer(),
-                objPtr->getPosition().getIntified().getX(),
-                objPtr->getPosition().getIntified().getY());
-        }
-        SDL_SetRenderDrawColor(renderWindow.getRenderer(), 255, 0, 0, 255);
-        if (quadTreePtr->getQuadByPosition(mousePos.getFloatified()) != nullptr) {
-            quadTreePtr->getQuadByPosition(mousePos.getFloatified())->draw(renderWindow.getRenderer());
-        }
-        SDL_RenderPresent(renderWindow.getRenderer());
+        glWindow.render();
     } // render
 
     bool Instance::init() {
         // If any of them fails, initialization fails.
-        if (renderWindow.initSDL() &&
-            renderWindow.initWindow() &&
-            renderWindow.initRenderer()) {
+        if (glWindow.initSDL() &&
+            glWindow.initWindow() &&
+            glWindow.initOpenGL()) {
             return true;
         } else {
             return false;

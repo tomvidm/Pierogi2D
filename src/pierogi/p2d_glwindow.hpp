@@ -3,7 +3,11 @@
 
 #include <iostream>
 
+#include "GL/glew.h"
+
 #include "SDL.h"
+#include "SDL_opengl.h"
+
 #include "p2d_viewport.hpp"
 #include "p2d_typedefs.hpp"
 
@@ -19,6 +23,10 @@ namespace p2d {
 
         bool initSDL();
         bool initWindow();
+        bool initOpenGL();
+
+        void flip() const;
+        void render() const;
 
         inline SDL_Window* getWindow() { return sdlWindowPtr; }
     private:

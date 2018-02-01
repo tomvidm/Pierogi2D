@@ -9,6 +9,9 @@ namespace p2d {
     public:
         math::Vector2f toScreenSpace(const math::Vector2f& vec) const;
         math::Vector2f toWorldSpace(const math::Vector2f& vec) const;
+
+        void moveTo(const math::Vector2f& pos);
+        void moveRelative(const math::Vector2f& dpos);
     private:
         utility::Rect<float> viewportRect;
     }; // Viewport

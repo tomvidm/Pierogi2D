@@ -9,7 +9,7 @@
 #include "p2d_typedefs.hpp"
 #include "p2d_utility.hpp"
 #include "p2d_object.hpp"
-#include "p2d_window.hpp"
+#include "p2d_glwindow.hpp"
 #include "p2d_quadtree.hpp"
 
 #include <memory>
@@ -31,7 +31,7 @@ namespace p2d {
         void handleInput();
         void update(float dt);
         void render();
-        p2d::RenderWindow renderWindow;
+        p2d::GLWindow glWindow;
         p2d::input::EventHandler eventHandler;
         p2d::debug::Logger* logger;
 

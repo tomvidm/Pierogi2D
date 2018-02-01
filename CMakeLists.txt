@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.0)
 project(sdl2eng)
 
 find_package(OpenGL REQUIRED)   
-message(STATUS ${OPENGL_INCLUDE_DIR})
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
