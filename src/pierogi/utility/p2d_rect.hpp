@@ -22,6 +22,10 @@ namespace p2d { namespace utility {
         void operator += (const Vector2<T>& rhs);
         void operator *= (const float& factor);
 
+        void setOrigin(const Vector2<T>& o);
+        void setSize(const Vector2<T>& s);
+
+        inline Vector2<T> getOrigin() const { return origin; }
         inline Vector2<T> getSize() const { return size; }
         inline Vector2<T> getCenter() const { return origin + size * 0.5f; }
 
@@ -89,7 +93,17 @@ namespace p2d { namespace utility {
         Rect<T> copy = *this;
         copy *= factor;
         return copy;
-    }
+    } // operator *
+
+    template <typename T>
+    void Rect<T>::setOrigin(const Vector2<T>& o) {
+        origin = o;
+    } // setOrigin
+
+    template <typename T>
+    void Rect<T>::setSize(const Vector2<T>& s) {
+        origin = o;
+    } // setSize
 
     template <typename T>
     SDL_Rect Rect<T>::getSDLRect() const {

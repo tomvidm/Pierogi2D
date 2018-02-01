@@ -1,5 +1,5 @@
-#ifndef P2D_WINDOW_HPP
-#define P2D_WINDOW_HPP
+#ifndef P2D_GLWINDOW_HPP
+#define P2D_GLWINDOW_HPP
 
 #include <iostream>
 
@@ -12,23 +12,20 @@
 */
 
 namespace p2d {
-    class RenderWindow {
+    class GLWindow {
     public:
-        RenderWindow();
-        ~RenderWindow();
+        GLWindow();
+        ~GLWindow();
 
         bool initSDL();
         bool initWindow();
-        bool initRenderer();
 
         inline SDL_Window* getWindow() { return sdlWindowPtr; }
-        inline SDL_Renderer* getRenderer() { return sdlRendererPtr; }
     private:
         SDL_Window* sdlWindowPtr;
-        SDL_Renderer* sdlRendererPtr;
 
         Viewport viewport;
-    }; // class RenderWindow
+    }; // class GLWindow
 } // namespace p2d
 
 #endif
