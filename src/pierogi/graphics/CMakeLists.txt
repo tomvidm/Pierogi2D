@@ -16,7 +16,7 @@ target_link_libraries(p2d-graphics PUBLIC
     )
 
 target_include_directories(p2d-graphics PUBLIC 
-    ${SDL2_INCLUDE_DIR}
+    ${SDL2_INCLUDE_DIRS}
     ${SRC_DIR}/pierogi/debug
     ${SRC_DIR}/pierogi/math
     ${SRC_DIR}/pierogi/utility

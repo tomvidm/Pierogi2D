@@ -1,7 +1,7 @@
 #ifndef P2D_MATH_HPP
 #define P2D_MATH_HPP
 
-#include <cmath >
+#include <cmath>
 
 #include "p2d_vector.hpp"
 

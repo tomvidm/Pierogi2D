@@ -126,7 +126,7 @@ namespace p2d { namespace utility {
             } // if
         } // for
         container = newContainer;
-        quadPtr->sendObjectCountToRoot(-1);
+        objPtr->sendObjectCountToRoot(-1);
         
     } // removeObject
 
@@ -160,7 +160,7 @@ namespace p2d { namespace utility {
     std::shared_ptr<QuadTreeNode<T>> QuadTreeNode<T>::findNextQuadContaining(const p2d::math::Vector2f& position) {
         if (containsPoint(position)) {
             if (isLeafNode()) {
-                return shared_from_this();
+                return this->shared_from_this();
             }   else {
                 for (uint q = 0; q < NUM_SUBQUADS; q++) {
                     if (subnodes[q]->containsPoint(position)) {
@@ -178,7 +178,7 @@ namespace p2d { namespace utility {
     std::shared_ptr<QuadTreeNode<T>> QuadTreeNode<T>::findSmallestQuadContaining(const p2d::math::Vector2f& position) {
         if (containsPoint(position)) {
             if (isLeafNode()) {
-                return shared_from_this();
+                return this->shared_from_this();
             }   else {
                 for (uint q = 0; q < NUM_SUBQUADS; q++) {
                     if (subnodes[q]->containsPoint(position)) {
@@ -250,7 +250,8 @@ namespace p2d { namespace utility {
 
     template <typename T>
     void QuadTreeNode<T>::draw(SDL_Renderer* renderer) const {
-        SDL_RenderDrawRect(renderer, &coverage.getSDLRect());
+        SDL_Rect rect = coverage.getSDLRect();
+        SDL_RenderDrawRect(renderer, &rect);
         if (isLeafNode()) {
             return;
         } else {

@@ -30,7 +30,7 @@ target_link_libraries(p2d-core PUBLIC
 
 target_include_directories(p2d-core PUBLIC
     ${OPENGL_INCLUDE_DIR}
-    ${SDL2_INCLUDE_DIR}
+    ${SDL2_INCLUDE_DIRS}
     ${GLEW_INCLUDE_DIR}
     ${SRC_DIR}/pierogi
     ${SRC_DIR}/pierogi/debug
